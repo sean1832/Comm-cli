@@ -41,7 +41,7 @@ def get_local_ip():
         s.close()
     return IP
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(description="UDP Chat Application")
     parser.add_argument('--get-ip', action='store_true', help='Get local IP address')
     parser.add_argument('-v', '--version', action='store_true', help='Get current version')
@@ -70,3 +70,6 @@ if __name__ == "__main__":
         print("No mode specified. Use --help for more information.")
     else:
         print(f"Unknown mode: {args.mode}")
+
+if __name__ == "__main__":
+    main()
