@@ -28,14 +28,17 @@ def receive_messages(args):
         message, address = sock.recvfrom(1024)
         if message.decode() == phrase['exit']:
             break
-        print(f"Message from {address}: {message.decode()}")
+        if args.annomyous:
+            print(f"{message.decode()}")
+        else:
+            print(f"Message from {address}: {message.decode()}")
 
 def send_messages(args):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     print(f"Sending messages to {args.ip}:{args.port}")
 
     while True:
-        message = input("Enter message to send: ")
+        message = input("send: ")
         sock.sendto(message.encode(), (args.ip, args.port))
         if message == phrase['exit']:
             break
@@ -49,6 +52,7 @@ def main():
     # Sub-parser for receive
     receive_parser = subparsers.add_parser('get')
     receive_parser.add_argument('-p', '--port', type=int, help='Port number')
+    receive_parser.add_argument('-a', '--annomyous', action='store_true', help='Annomyous mode (no IP address)')
     receive_parser.set_defaults(func=receive_messages)
 
     # Sub-parser for send
