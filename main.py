@@ -54,7 +54,7 @@ def main():
     parser = argparse.ArgumentParser(description="UDP Chat Application")
     parser.add_argument('--get-ip', action='store_true', help='Get local IP address')
     parser.add_argument('-v', '--version', action='store_true', help='Get current version')
-    parser.add_argument('--ip', type=str, default='', help='IP address of the other party (empty for server mode)')
+    parser.add_argument('-i', '--ip', type=str, default='', help='IP address of the other party (empty for server mode)')
     parser.add_argument('-p', '--port', type=int, default=12345, help='Port number')
     parser.add_argument('--verbose', action='store_true', help='Enable verbose mode')
 
