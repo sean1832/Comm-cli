@@ -1,104 +1,72 @@
 #!/usr/bin/env python3
-from ast import arg
 import socket
 import argparse
 import threading
-import time
 
 version = "0.0.1"
 
-def init_handshake(sock):
+def init_handshake(sock, target_address):
+    if target_address:
+        sock.sendto("READY".encode(), target_address)
     print("Waiting for server to be ready...")
     while True:
         try:
             message, address = sock.recvfrom(1024)
             if message.decode() == "READY":
-                print("Server is ready. Listening for messages...")
+                print("Handshake completed. Ready for communication.")
                 break
         except OSError as e:
             print(f"Error receiving message: {e}")
             break
 
-def receive_messages(sock, verbose):
-    # Perform initial handshake
-    init_handshake(sock)
-
-    if verbose:
-        print("Verbose mode enabled")
-        while True:
-            message, address = sock.recvfrom(1024)
-            print(f"Message from {address}: {message.decode()}")
-    else:
-        while True:
-            message, address = sock.recvfrom(1024)
-            print(f"{message.decode()}")
+def receive_messages(sock):
+    while True:
+        message, address = sock.recvfrom(1024)
+        print(f"Message from {address}: {message.decode()}")
 
 def send_messages(sock, target_address):
     while True:
         message = input("Enter message to send: ")
         sock.sendto(message.encode(), target_address)
 
-def run_server(port, verbose=False):
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    server_socket.bind(('0.0.0.0', port))
-    server_socket.sendto(b"READY", ('<CLIENT_IP_ADDRESS>', port))
-    print(f"UDP Server listening on port {port}")
+def run_application(mode, address, port, verbose):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.bind(('0.0.0.0', port) if mode == 'server' else ('0.0.0.0', 0))
 
-    threading.Thread(target=receive_messages, args=(server_socket, verbose,), daemon=True).start()
-    
-    send_messages(server_socket, ('<CLIENT_IP_ADDRESS>', port))
+    target_address = (address, port) if mode == 'client' else None
+    init_handshake(sock, target_address)
 
-def run_client(server_ip, port, verbose=False):
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-    # Pass the verbose argument to the receive_messages function
-    threading.Thread(target=receive_messages, args=(client_socket, verbose,), daemon=True).start()
-    send_messages(client_socket, (server_ip, port))
+    threading.Thread(target=receive_messages, args=(sock,), daemon=True).start()
+    send_messages(sock, target_address)
 
 def get_local_ip():
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        # doesn't even have to be reachable
-        s.connect(('10.255.255.255', 1))
-        IP = s.getsockname()[0]
+        sock.connect(('10.255.255.255', 1))
+        IP = sock.getsockname()[0]
     except Exception:
         IP = '127.0.0.1'
     finally:
-        s.close()
+        sock.close()
     return IP
 
 def main():
     parser = argparse.ArgumentParser(description="UDP Chat Application")
     parser.add_argument('--get-ip', action='store_true', help='Get local IP address')
     parser.add_argument('-v', '--version', action='store_true', help='Get current version')
-    subparsers = parser.add_subparsers(dest='mode')
-
-    # Server parser
-    server_parser = subparsers.add_parser('server')
-    server_parser.add_argument('-p', '--port', type=int, default=12345, help='Port number')
-    server_parser.add_argument('--verbose', help='Verbose mode', action='store_true')
-
-    # Client parser
-    client_parser = subparsers.add_parser('client')
-    client_parser.add_argument('-i', '--ip', type=str, required=True, help='Server IP address')
-    client_parser.add_argument('-p', '--port', type=int, default=12345, help='Port number')
-    client_parser.add_argument('--verbose', help='Verbose mode', action='store_true')
+    parser.add_argument('--ip', type=str, default='', help='IP address of the other party (empty for server mode)')
+    parser.add_argument('-p', '--port', type=int, default=12345, help='Port number')
+    parser.add_argument('--verbose', action='store_true', help='Enable verbose mode')
 
     args = parser.parse_args()
 
     if args.version:
         print(f"{version}")
     elif args.get_ip:
-            print(f"Local IP Address: {get_local_ip()}")
-    elif args.mode == 'server':
-        run_server(args.port, verbose=args.verbose)
-        print(args.verboses)
-    elif args.mode == 'client':
-        run_client(args.ip, args.port, verbose=args.verbose)
-    elif args.mode is None:
-        print("No mode specified. Use --help for more information.")
+        print(f"Local IP Address: {get_local_ip()}")
     else:
-        print(f"Unknown mode: {args.mode}")
+        mode = 'client' if args.ip else 'server'
+        run_application(mode, args.ip, args.port, args.verbose)
 
 if __name__ == "__main__":
     main()
