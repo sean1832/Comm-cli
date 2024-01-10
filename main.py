@@ -3,10 +3,26 @@ from ast import arg
 import socket
 import argparse
 import threading
+import time
 
 version = "0.0.1"
 
+def init_handshake(sock):
+    print("Waiting for server to be ready...")
+    while True:
+        try:
+            message, address = sock.recvfrom(1024)
+            if message.decode() == "READY":
+                print("Server is ready. Listening for messages...")
+                break
+        except OSError as e:
+            print(f"Error receiving message: {e}")
+            break
+
 def receive_messages(sock, verbose):
+    # Perform initial handshake
+    init_handshake(sock)
+
     if verbose:
         print("Verbose mode enabled")
         while True:
@@ -25,9 +41,11 @@ def send_messages(sock, target_address):
 def run_server(port, verbose=False):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     server_socket.bind(('0.0.0.0', port))
+    server_socket.sendto(b"READY", ('<CLIENT_IP_ADDRESS>', port))
     print(f"UDP Server listening on port {port}")
 
     threading.Thread(target=receive_messages, args=(server_socket, verbose,), daemon=True).start()
+    
     send_messages(server_socket, ('<CLIENT_IP_ADDRESS>', port))
 
 def run_client(server_ip, port, verbose=False):
