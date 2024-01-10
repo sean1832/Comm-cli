@@ -1,0 +1,1 @@
+pyinstaller --onefile --name udp-chat.exe main.py
