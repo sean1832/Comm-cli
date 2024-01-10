@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='udp-chat',
-    version='0.0.1',
+    version='0.0.2',
     author='Zeke Zhang',
     description='cli chat application using udp',
     scripts=['main.py'],
