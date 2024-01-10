@@ -1,32 +1,40 @@
 #!/usr/bin/env python3
+from ast import arg
 import socket
 import argparse
 import threading
 
 version = "0.0.1"
 
-def receive_messages(sock):
-    while True:
-        message, address = sock.recvfrom(1024)
-        print(f"Message from {address}: {message.decode()}")
+def receive_messages(sock, verbose):
+    if verbose:
+        print("Verbose mode enabled")
+        while True:
+            message, address = sock.recvfrom(1024)
+            print(f"Message from {address}: {message.decode()}")
+    else:
+        while True:
+            message, address = sock.recvfrom(1024)
+            print(f"{message.decode()}")
 
 def send_messages(sock, target_address):
     while True:
         message = input("Enter message to send: ")
         sock.sendto(message.encode(), target_address)
 
-def run_server(port):
+def run_server(port, verbose=False):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     server_socket.bind(('0.0.0.0', port))
     print(f"UDP Server listening on port {port}")
 
-    threading.Thread(target=receive_messages, args=(server_socket,), daemon=True).start()
+    threading.Thread(target=receive_messages, args=(server_socket, verbose,), daemon=True).start()
     send_messages(server_socket, ('<CLIENT_IP_ADDRESS>', port))
 
-def run_client(server_ip, port):
+def run_client(server_ip, port, verbose=False):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-    threading.Thread(target=receive_messages, args=(client_socket,), daemon=True).start()
+    # Pass the verbose argument to the receive_messages function
+    threading.Thread(target=receive_messages, args=(client_socket, verbose,), daemon=True).start()
     send_messages(client_socket, (server_ip, port))
 
 def get_local_ip():
@@ -50,11 +58,13 @@ def main():
     # Server parser
     server_parser = subparsers.add_parser('server')
     server_parser.add_argument('-p', '--port', type=int, default=12345, help='Port number')
+    server_parser.add_argument('--verbose', help='Verbose mode', action='store_true')
 
     # Client parser
     client_parser = subparsers.add_parser('client')
     client_parser.add_argument('-i', '--ip', type=str, required=True, help='Server IP address')
     client_parser.add_argument('-p', '--port', type=int, default=12345, help='Port number')
+    client_parser.add_argument('--verbose', help='Verbose mode', action='store_true')
 
     args = parser.parse_args()
 
@@ -63,9 +73,10 @@ def main():
     elif args.get_ip:
             print(f"Local IP Address: {get_local_ip()}")
     elif args.mode == 'server':
-        run_server(args.port)
+        run_server(args.port, verbose=args.verbose)
+        print(args.verboses)
     elif args.mode == 'client':
-        run_client(args.ip, args.port)
+        run_client(args.ip, args.port, verbose=args.verbose)
     elif args.mode is None:
         print("No mode specified. Use --help for more information.")
     else:
