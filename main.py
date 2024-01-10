@@ -1,6 +1,9 @@
+#!/usr/bin/env python3
 import socket
 import argparse
 import threading
+
+version = "0.0.1"
 
 def receive_messages(sock):
     while True:
@@ -41,6 +44,7 @@ def get_local_ip():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="UDP Chat Application")
     parser.add_argument('--get-ip', action='store_true', help='Get local IP address')
+    parser.add_argument('-v', '--version', action='store_true', help='Get current version')
     subparsers = parser.add_subparsers(dest='mode')
 
     # Server parser
@@ -54,7 +58,9 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    if args.get_ip:
+    if args.version:
+        print(f"{version}")
+    elif args.get_ip:
             print(f"Local IP Address: {get_local_ip()}")
     elif args.mode == 'server':
         run_server(args.port)
