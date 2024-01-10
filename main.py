@@ -41,7 +41,7 @@ def send_messages(args):
             break
 
 def main():
-    parser = argparse.ArgumentParser(description="UDP Chat Application")
+    parser = argparse.ArgumentParser(description=f"UDP Chat Application v{version}")
     parser.add_argument('-v', '--version', action='store_true', help='Get current version')
     parser.add_argument('--get-ip', action='store_true', help='Get local IP address')
     subparsers = parser.add_subparsers(dest='command')
