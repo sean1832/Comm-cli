@@ -44,4 +44,4 @@ Run the program from the terminal or command prompt.
 Contributions are welcome. Please follow the standard fork and pull request workflow.
 
 ## License
-This project is licensed under [MIT](). See the LICENSE file for details.
+This project is licensed under [Apache License 2.0](LICENSE). See the LICENSE file for details.
