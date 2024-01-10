@@ -3,7 +3,7 @@ import socket
 import argparse
 import threading
 
-version = "0.0.1"
+version = "0.0.2"
 
 def init_handshake(sock, target_address):
     if target_address:
