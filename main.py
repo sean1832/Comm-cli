@@ -35,7 +35,7 @@ def send_messages(args):
     print(f"Sending messages to {args.ip}:{args.port}")
 
     while True:
-        message = input("Enter message to ssend: ")
+        message = input("Enter message to send: ")
         sock.sendto(message.encode(), (args.ip, args.port))
         if message == phrase['exit']:
             break
