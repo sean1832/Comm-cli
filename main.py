@@ -2,7 +2,7 @@
 import socket
 import argparse
 
-version = "0.0.1"
+version = "0.0.3"
 phrase = {
     'exit': "EXIT",
 }
