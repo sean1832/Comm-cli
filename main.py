@@ -79,7 +79,7 @@ def send_file(args):
             sock.sendto(data, (args.ip, args.port))
             # print progress
             print(f"Progress: {f.tell()}/{file_size}", end='\r')
-    print(f"complete.")
+    print(f"\ncomplete. [{args.file_path}]")
 
 def recieve_file(args):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -115,7 +115,7 @@ def recieve_file(args):
 
             # check if file is complete
             if f.tell() == file_size:
-                print(f"\ncomplete.")
+                print(f"\ncomplete. [{file_path}]")
                 break
     print(f"Validating file...")
     try:
@@ -188,6 +188,7 @@ def main():
     receive_parser.add_argument('-p', '--port', type=int, help='Port number')
     receive_parser.add_argument('-a', '--annomyous', action='store_true', help='Annomyous mode (no IP address)')
     receive_parser.add_argument('-f', '--file-path', type=str, help='File directory to save to, use "." to save to current directory.')
+    receive_parser.add_argument('-r', '--recursive', action='store_true', help='Recursive mode (keep listening)')
     receive_parser.set_defaults(func=receiver)
 
     # Sub-parser for send
