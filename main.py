@@ -10,6 +10,36 @@ phrase = {
     'exit': "EXIT",
 }
 
+def handshake_send(sock, args, timeout=5):
+    """
+    Perform a handshake between sender and receiver.
+    Returns True if the handshake is successful, False otherwise.
+    """
+    try:
+        # Send a handshake message
+        sock.sendto(b"handshake", (args.ip, args.port))
+        # Wait for acknowledgment
+        sock.settimeout(timeout)  # Timeout after 5 seconds
+        data, _ = sock.recvfrom(1024)
+        if data.decode() == "ack":
+            return True
+        return False
+    except socket.timeout:
+        print("Handshake failed: timeout")
+        return False
+
+def handshake_receive(sock):
+    """
+    Perform a handshake between sender and receiver.
+    Returns True if the handshake is successful, False otherwise.
+    """
+    data, address = sock.recvfrom(1024)
+    if data.decode() == "handshake":
+        # Send acknowledgment
+        sock.sendto(b"ack", address)
+        return True
+    return False
+
 def validate_hash(path, hash):
     if get_hash(path) == hash:
         return True
@@ -24,6 +54,12 @@ def get_hash(path):
 def send_file(args):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     print(f"Sending {args.file_path} to {args.ip}:{args.port}")
+
+    print(f"Performing handshake...")
+    if not handshake_send(sock, args, timeout=0.5):
+        print("Ensure that the receiver is open and listening on the correct port.")
+        return
+    print(f"Handshake successful.")
 
     with open(args.file_path, 'rb') as f:
         # get file size and hash
@@ -49,6 +85,9 @@ def recieve_file(args):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind(('0.0.0.0', args.port))
     print(f"Listening for file on port {args.port}...")
+    if not handshake_receive(sock):
+        print("Handshake failed.")
+        return
     # get metadata
     metadata, address = sock.recvfrom(1024)
     metadata = json.loads(metadata.decode())
