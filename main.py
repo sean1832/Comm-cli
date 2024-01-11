@@ -101,19 +101,27 @@ def recieve_file(args):
     file_hash = metadata['hash']
     print(f"Receiving file from {address}...")
 
-    with open(file_name, 'wb') as f:
-        while True:
-            data, address = sock.recvfrom(1024)
-            if not data:
-                break
-            f.write(data)
-            # print progress
-            print(f"Progress: {f.tell()}/{file_size}", end='\r')
-
-            # check if file is complete
-            if f.tell() == file_size:
-                print(f"\ncomplete. [{file_name}]")
-                break
+    try:
+        with open(file_name, 'wb') as f:
+            while True:
+                data, address = sock.recvfrom(1024)
+                if not data:
+                    break
+                f.write(data)
+                # print progress
+                print(f"Progress: {f.tell()}/{file_size}", end='\r')
+                # set timeout to 5 seconds
+                sock.settimeout(5)
+                # check if file is complete
+                if f.tell() == file_size:
+                    print(f"\ncomplete. [{file_name}]")
+                    break
+    except socket.timeout:
+        print(f"File transfer timed out.")
+        return
+    except Exception as e:
+        print(f"File transfer failed: {e}")
+        return
     print(f"Validating file...")
     try:
         if validate_hash(file_name, file_hash):
