@@ -1,11 +1,85 @@
 #!/usr/bin/env python3
 import socket
 import argparse
+import os
+import hashlib
+import json
 
 version = "0.0.3"
 phrase = {
     'exit': "EXIT",
 }
+
+def validate_hash(path, hash):
+    if get_hash(path) == hash:
+        return True
+    else:
+        return False
+
+def get_hash(path):
+    with open(path, 'rb') as f:
+        data = f.read()
+        return hashlib.md5(data).hexdigest()
+
+def send_file(args):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    print(f"Sending {args.file_path} to {args.ip}:{args.port}")
+
+    with open(args.file_path, 'rb') as f:
+        # get file size and hash
+        file_name = os.path.basename(args.file_path)
+        file_size = os.path.getsize(args.file_path)
+        file_hash = get_hash(args.file_path)
+        metadata = {
+            'name': file_name,
+            'size': file_size,
+            'hash': file_hash
+        }
+        sock.sendto(json.dumps(metadata).encode(), (args.ip, args.port))
+        while True:
+            data = f.read(1024)
+            if not data:
+                break
+            sock.sendto(data, (args.ip, args.port))
+            # print progress
+            print(f"Progress: {f.tell()}/{file_size}", end='\r')
+    print(f"complete.")
+
+def recieve_file(args):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.bind(('0.0.0.0', args.port))
+    print(f"Listening for file on port {args.port}...")
+    # get metadata
+    metadata, address = sock.recvfrom(1024)
+    metadata = json.loads(metadata.decode())
+    file_name = metadata['name']
+    file_size = metadata['size']
+    file_hash = metadata['hash']
+    print(f"Receiving file from {address}...")
+
+    if args.file_path:
+        file_name = args.file_path
+
+    with open(file_name, 'wb') as f:
+        while True:
+            data, address = sock.recvfrom(1024)
+            if not data:
+                break
+            f.write(data)
+            # print progress
+            print(f"Progress: {f.tell()}/{file_size}", end='\r')
+
+            # check if file is complete
+            if f.tell() == file_size:
+                print(f"\ncomplete.")
+                break
+    print(f"Validating file...")
+    if validate_hash(args.file_path, file_hash):
+        print(f"File validated.")
+    else:
+        print(f"File validation failed! Expected {file_hash} but got {get_hash(args.file_path)}.")
+
+
 
 def get_local_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -43,6 +117,19 @@ def send_messages(args):
         if message == phrase['exit']:
             break
 
+def sender(args):
+    if args.file_path:
+        send_file(args)
+    else:
+        send_messages(args)
+
+def receiver(args):
+    if args.file_path:
+        recieve_file(args)
+    else:
+        receive_messages(args)
+
+
 def main():
     parser = argparse.ArgumentParser(description=f"UDP Chat Application v{version}")
     parser.add_argument('-v', '--version', action='store_true', help='Get current version')
@@ -53,13 +140,15 @@ def main():
     receive_parser = subparsers.add_parser('get')
     receive_parser.add_argument('-p', '--port', type=int, help='Port number')
     receive_parser.add_argument('-a', '--annomyous', action='store_true', help='Annomyous mode (no IP address)')
-    receive_parser.set_defaults(func=receive_messages)
+    receive_parser.add_argument('-f', '--file-path', type=str, help='File path to save to')
+    receive_parser.set_defaults(func=receiver)
 
     # Sub-parser for send
     send_parser = subparsers.add_parser('post')
     send_parser.add_argument('-i', '--ip', type=str, required=True, help='Target IP address')
     send_parser.add_argument('-p', '--port', type=int, help='Port number')
-    send_parser.set_defaults(func=send_messages)
+    send_parser.add_argument('-f', '--file-path', type=str, help='File path to send')
+    send_parser.set_defaults(func=sender)
 
     args = parser.parse_args()
 
