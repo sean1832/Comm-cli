@@ -5,7 +5,7 @@ import os
 import hashlib
 import json
 
-version = "0.0.3"
+version = "0.0.4"
 phrase = {
     'exit': "EXIT",
 }
