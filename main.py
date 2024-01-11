@@ -90,21 +90,18 @@ def recieve_file(args):
         return
     # get metadata
     metadata, address = sock.recvfrom(1024)
-    metadata = json.loads(metadata.decode())
+    try:
+        metadata = json.loads(metadata.decode())
+    except Exception as e:
+        print(f"Failed to decode metadata: {e}")
+        print(f"metadata: {metadata}")
+        return
     file_name = metadata['name']
     file_size = metadata['size']
     file_hash = metadata['hash']
     print(f"Receiving file from {address}...")
 
-    if not os.path.exists(args.file_path):
-        os.makedirs(args.file_path)
-    
-    if not args.file_path.endswith('/'):
-        args.file_path += '/'
-    file_path = os.path.join(args.file_path, file_name)
-    
-
-    with open(file_path, 'wb') as f:
+    with open(file_name, 'wb') as f:
         while True:
             data, address = sock.recvfrom(1024)
             if not data:
@@ -115,18 +112,20 @@ def recieve_file(args):
 
             # check if file is complete
             if f.tell() == file_size:
-                print(f"\ncomplete. [{file_path}]")
+                print(f"\ncomplete. [{file_name}]")
                 break
     print(f"Validating file...")
     try:
-        if validate_hash(file_path, file_hash):
+        if validate_hash(file_name, file_hash):
             print(f"File validated.")
         else:
-            print(f"File validation failed! Expected {file_hash} but got {get_hash(args.file_path)}.")
+            print(f"File validation failed! Expected {file_hash} but got {get_hash(file_name)}.")
     except Exception as e:
         print(f"File validation failed! {e}")
 
-
+def recieve_files(args):
+        while True:
+            recieve_file(args)
 
 def get_local_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -172,7 +171,7 @@ def sender(args):
 
 def receiver(args):
     if args.file_path:
-        recieve_file(args)
+        recieve_files(args) if args.recursive else recieve_file(args)
     else:
         receive_messages(args)
 
