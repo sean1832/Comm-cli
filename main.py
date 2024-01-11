@@ -57,7 +57,7 @@ def recieve_file(args):
     file_hash = metadata['hash']
     print(f"Receiving file from {address}...")
 
-    if args.file_path:
+    if args.file_path != '.':
         file_name = args.file_path
 
     with open(file_name, 'wb') as f:
@@ -74,10 +74,13 @@ def recieve_file(args):
                 print(f"\ncomplete.")
                 break
     print(f"Validating file...")
-    if validate_hash(args.file_path, file_hash):
-        print(f"File validated.")
-    else:
-        print(f"File validation failed! Expected {file_hash} but got {get_hash(args.file_path)}.")
+    try:
+        if validate_hash(file_name, file_hash):
+            print(f"File validated.")
+        else:
+            print(f"File validation failed! Expected {file_hash} but got {get_hash(args.file_path)}.")
+    except Exception as e:
+        print(f"File validation failed! {e}")
 
 
 
