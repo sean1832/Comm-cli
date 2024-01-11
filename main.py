@@ -96,10 +96,15 @@ def recieve_file(args):
     file_hash = metadata['hash']
     print(f"Receiving file from {address}...")
 
-    if args.file_path != '.':
-        file_name = args.file_path
+    if not os.path.exists(args.file_path):
+        os.makedirs(args.file_path)
+    
+    if not args.file_path.endswith('/'):
+        args.file_path += '/'
+    file_path = os.path.join(args.file_path, file_name)
+    
 
-    with open(file_name, 'wb') as f:
+    with open(file_path, 'wb') as f:
         while True:
             data, address = sock.recvfrom(1024)
             if not data:
@@ -114,7 +119,7 @@ def recieve_file(args):
                 break
     print(f"Validating file...")
     try:
-        if validate_hash(file_name, file_hash):
+        if validate_hash(file_path, file_hash):
             print(f"File validated.")
         else:
             print(f"File validation failed! Expected {file_hash} but got {get_hash(args.file_path)}.")
@@ -182,7 +187,7 @@ def main():
     receive_parser = subparsers.add_parser('get')
     receive_parser.add_argument('-p', '--port', type=int, help='Port number')
     receive_parser.add_argument('-a', '--annomyous', action='store_true', help='Annomyous mode (no IP address)')
-    receive_parser.add_argument('-f', '--file-path', type=str, help='File path to save to')
+    receive_parser.add_argument('-f', '--file-path', type=str, help='File directory to save to, use "." to save to current directory.')
     receive_parser.set_defaults(func=receiver)
 
     # Sub-parser for send
