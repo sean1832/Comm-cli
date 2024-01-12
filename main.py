@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
-from ast import Try
-from http import client
 import socket
 import argparse
 import os
 import hashlib
 import json
 from sys import exception
-from typing import final
 
 version = "0.0.5"
 phrase = {
