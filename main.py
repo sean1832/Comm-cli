@@ -312,21 +312,21 @@ def main():
     subparsers = parser.add_subparsers(dest='command')
 
     # Get local IP command parser
-    get_ip_parser = subparsers.add_parser('ip')
+    get_ip_parser = subparsers.add_parser('ip', help='Get local IP address')
     get_ip_parser.set_defaults(func=get_local_ip)
 
     # Post command parser
-    post_parser = subparsers.add_parser('post')
+    post_parser = subparsers.add_parser('post', help='Send data')
     post_subparsers = post_parser.add_subparsers(dest='type')
 
     # Post message
-    post_msg_parser = post_subparsers.add_parser('msg')
+    post_msg_parser = post_subparsers.add_parser('msg', help='Send plaintext messages')
     post_msg_parser.add_argument('ip', type=str, help='Target IP address')
     post_msg_parser.add_argument('port', type=int, help='Port number')
     post_msg_parser.set_defaults(func=send_messages)
 
     # Post file
-    post_file_parser = post_subparsers.add_parser('file')
+    post_file_parser = post_subparsers.add_parser('file', help='Send files as binary')
     post_file_parser.add_argument('ip', type=str, help='Target IP address')
     post_file_parser.add_argument('port', type=int, help='Port number')
     post_file_parser.add_argument('file_path', type=str, help='File path to send')
@@ -334,17 +334,17 @@ def main():
     post_file_parser.set_defaults(func=send_file)
 
     # Get command parser
-    get_parser = subparsers.add_parser('get')
+    get_parser = subparsers.add_parser('get', help='Receive data')
     get_subparsers = get_parser.add_subparsers(dest='type')
 
     # Get message
-    get_msg_parser = get_subparsers.add_parser('msg')
+    get_msg_parser = get_subparsers.add_parser('msg', help='Receive plaintext messages')
     get_msg_parser.add_argument('port', type=int, help='Port number')
     get_msg_parser.add_argument('-a', '--annomyous', action='store_true', help='Receive messages annomyously')
     get_msg_parser.set_defaults(func=receive_messages)
 
     # Get file
-    get_file_parser = get_subparsers.add_parser('file')
+    get_file_parser = get_subparsers.add_parser('file', help='Receive files as binary')
     get_file_parser.add_argument('port', type=int, help='Port number')
     get_file_parser.add_argument('file_dir', type=str, help='File directory to save to')
     get_file_parser.add_argument('-r', '--recursive', action='store_true', help='Receive files recursively')
