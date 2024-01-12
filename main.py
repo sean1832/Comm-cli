@@ -110,8 +110,8 @@ def recieve_file(args):
                 f.write(data)
                 # print progress
                 print(f"Progress: {f.tell()}/{file_size}", end='\r')
-                # set timeout to 5 seconds
-                sock.settimeout(5)
+                # set timeout to 3 seconds
+                sock.settimeout(3)
                 # check if file is complete
                 if f.tell() == file_size:
                     print(f"\ncomplete. [{file_name}]")
@@ -178,7 +178,7 @@ def sender(args):
         send_messages(args)
 
 def receiver(args):
-    if args.file_path:
+    if args.file_dir:
         recieve_files(args) if args.recursive else recieve_file(args)
     else:
         receive_messages(args)
@@ -186,24 +186,43 @@ def receiver(args):
 
 def main():
     parser = argparse.ArgumentParser(description=f"UDP Chat Application v{version}")
-    parser.add_argument('-v', '--version', action='store_true', help='Get current version')
-    parser.add_argument('--get-ip', action='store_true', help='Get local IP address')
+    parser.add_argument('-v', '--version', action='store_true', help='Print version')
+    parser.add_argument('-i', '--get-ip', action='store_true', help='Print local IP address')
     subparsers = parser.add_subparsers(dest='command')
 
-    # Sub-parser for receive
-    receive_parser = subparsers.add_parser('get')
-    receive_parser.add_argument('-p', '--port', type=int, help='Port number')
-    receive_parser.add_argument('-a', '--annomyous', action='store_true', help='Annomyous mode (no IP address)')
-    receive_parser.add_argument('-f', '--file-path', type=str, help='File directory to save to, use "." to save to current directory.')
-    receive_parser.add_argument('-r', '--recursive', action='store_true', help='Recursive mode (keep listening)')
-    receive_parser.set_defaults(func=receiver)
+    # Post command parser
+    post_parser = subparsers.add_parser('post')
+    post_subparsers = post_parser.add_subparsers(dest='type')
 
-    # Sub-parser for send
-    send_parser = subparsers.add_parser('post')
-    send_parser.add_argument('-i', '--ip', type=str, required=True, help='Target IP address')
-    send_parser.add_argument('-p', '--port', type=int, help='Port number')
-    send_parser.add_argument('-f', '--file-path', type=str, help='File path to send')
-    send_parser.set_defaults(func=sender)
+    # Post message
+    post_msg_parser = post_subparsers.add_parser('msg')
+    post_msg_parser.add_argument('ip', type=str, help='Target IP address')
+    post_msg_parser.add_argument('port', type=int, help='Port number')
+    post_msg_parser.set_defaults(func=send_messages)
+
+    # Post file
+    post_file_parser = post_subparsers.add_parser('file')
+    post_file_parser.add_argument('ip', type=str, help='Target IP address')
+    post_file_parser.add_argument('port', type=int, help='Port number')
+    post_file_parser.add_argument('file_path', type=str, help='File path to send')
+    post_file_parser.set_defaults(func=send_file)
+
+    # Get command parser
+    get_parser = subparsers.add_parser('get')
+    get_subparsers = get_parser.add_subparsers(dest='type')
+
+    # Get message
+    get_msg_parser = get_subparsers.add_parser('msg')
+    get_msg_parser.add_argument('port', type=int, help='Port number')
+    get_msg_parser.add_argument('-a', '--annomyous', action='store_true', help='Receive messages annomyously')
+    get_msg_parser.set_defaults(func=receive_messages)
+
+    # Get file
+    get_file_parser = get_subparsers.add_parser('file')
+    get_file_parser.add_argument('port', type=int, help='Port number')
+    get_file_parser.add_argument('file_dir', type=str, help='File directory to save to')
+    get_file_parser.add_argument('-r', '--recursive', action='store_true', help='Receive files recursively')
+    get_file_parser.set_defaults(func=receiver)
 
     args = parser.parse_args()
 
