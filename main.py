@@ -5,7 +5,7 @@ import os
 import hashlib
 import json
 
-version = "0.0.4"
+version = "0.0.5"
 phrase = {
     'exit': "EXIT",
 }
@@ -51,7 +51,7 @@ def get_hash(path):
         data = f.read()
         return hashlib.md5(data).hexdigest()
 
-def send_file(args):
+def send_file_udp(args):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     print(f"Sending {args.file_path} to {args.ip}:{args.port}")
 
@@ -81,7 +81,7 @@ def send_file(args):
             print(f"Progress: {f.tell()}/{file_size}", end='\r')
     print(f"\ncomplete. [{args.file_path}]")
 
-def recieve_file(args):
+def recieve_file_udp(args):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind(('0.0.0.0', args.port))
     print(f"Listening for file on port {args.port}...")
@@ -131,9 +131,9 @@ def recieve_file(args):
     except Exception as e:
         print(f"File validation failed! {e}")
 
-def recieve_files(args):
+def recieve_files_udp(args):
         while True:
-            recieve_file(args)
+            recieve_file_udp(args)
 
 def get_local_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -171,17 +171,8 @@ def send_messages(args):
         if message == phrase['exit']:
             break
 
-def sender(args):
-    if args.file_path:
-        send_file(args)
-    else:
-        send_messages(args)
-
 def receiver(args):
-    if args.file_dir:
-        recieve_files(args) if args.recursive else recieve_file(args)
-    else:
-        receive_messages(args)
+    recieve_files_udp(args) if args.recursive else recieve_file_udp(args)
 
 
 def main():
@@ -205,7 +196,7 @@ def main():
     post_file_parser.add_argument('ip', type=str, help='Target IP address')
     post_file_parser.add_argument('port', type=int, help='Port number')
     post_file_parser.add_argument('file_path', type=str, help='File path to send')
-    post_file_parser.set_defaults(func=send_file)
+    post_file_parser.set_defaults(func=send_file_udp)
 
     # Get command parser
     get_parser = subparsers.add_parser('get')
