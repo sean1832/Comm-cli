@@ -1,47 +1,86 @@
-# UDP Chat
+# Network Data Exchanger (nx-cli)
 
-## Overview
-UDP Chat is a lightweight, terminal-based chat application enabling text communication over a local network. It uses the UDP protocol for message transmission. This tool is effective for transferring text data quickly between two computers in the same network environment.
+## 1. Overview 📋
+Network Data Exchanger (nx-cli) is a versatile command-line tool 🛠️ for sending and receiving messages and binary files over a network. It supports both UDP and TCP protocols and is primarily designed for use on local networks. This tool functions similarly to macOS's Airdrop, providing an efficient method for data transfer between computers on the same network.
 
-## Getting Started
+## 2. Features 🌟
+- **Plaintext Message Transfer:** Easily send plaintext contents from one computer to another within the same network.
 
-### Prerequisites
-- Python 3.x installed on your system
-- Network connectivity between the two computers
+- **File Sharing:** Quickly transfer files between computers without the need for USB drives or third-party websites like emails or messaging apps.
 
-### Installation
-1. Clone the repository.
-```bash
-git clone https://github.com/sean1832/udp-chat.git
-```
+- **UDP and TCP Protocol Support:** Flexibility to choose between UDP for faster transfers or TCP for more reliable transmission. *(UDP is the default protocol, but TCP is recommended for file sharing mode)*
+
+- **Local IP Retrieval:** Conveniently find out your computer's local IP address without needing to run `ipconfig` or `ifconfig`.
+
+- **Cross-Platform Compatibility:** Functions on any system with Python 3.x, enhancing versatility.
+
+
+## 3. Getting Started 🚀
+
+### Prerequisites 📝
+- Python 3.x installed on your system.
+- Network connectivity between the computers involved.
+
+### Installation 🔧
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/sean1832/nx-cli.git
+   ```
 2. Navigate to the source directory.
-3. Run the installation script (`install.sh` on UNIX, `install.bat` on Windows).
-> Note: On UNIX systems, you need to ensure that the script has executable permissions. You can do this by running `chmod +x install.sh` from the terminal.
-
-### Usage
-Run the program from the terminal or command prompt.
-
-#### Receiving Messages
-1. On the receiver's computer, execute:
+3. Install the package:
+   ```bash
+   pip install .
    ```
-   udp-chat get --port PORT_NUMBER
+
+## 4. Usage 📖
+Run nx-cli from the terminal or command prompt using various commands to send or receive data.
+
+#### Get Local IP 🌐
+Retrieve your computer's local IP address:
+   ```bash
+   nx ip
    ```
-   Replace `PORT_NUMBER` with the desired port number.
+> 📝 **Note:** Each computer's IP is unique. To send data, you need the IP of the receiving computer. Ensure both computers are on the same network.
 
-#### Sending Messages
-1. On the sender's computer, execute:
+#### Sending Files 📤
+
+To send a file:
+   ```bash
+   nx post file RECEIVER_IP PORT_NUMBER FILE_PATH [--tcp]
    ```
-   udp-chat post --ip RECEIVER_IP --port PORT_NUMBER
+Replace `RECEIVER_IP`, `PORT_NUMBER`, and `FILE_PATH` with the appropriate values.
+- Use `--tcp` for TCP transmission.
+> it is recommended to use TCP for file transfers to ensure reliability. UDP is faster but may result in data loss.
+
+#### Receiving Files 📥
+To receive a file:
+   ```bash
+   nx get file PORT_NUMBER SAVE_DIRECTORY [--tcp] [--recursive]
    ```
-   Replace `RECEIVER_IP` with the receiver's IP address and `PORT_NUMBER` with the port number used by the receiver.
+Replace `PORT_NUMBER` and `SAVE_DIRECTORY` with the desired port and directory path.
+- Use `--tcp` for TCP transmission. *(If sender uses `tcp`, the receiver must also use `tcp` to receive data.)*
+- Use `--recursive` for continuous reception.
 
-### Options
-- `-i`, `--version` : Displays the current version of the application.
-- `--get-ip` : Retrieves the local IP address of your computer.
-- `-a`, `--annomyous` : For receivers, hides the sender's IP address from the message display.
+#### Sending Messages 💬
+To send a message:
+   ```bash
+   nx post msg --ip RECEIVER_IP --port PORT_NUMBER
+   ```
+Replace `RECEIVER_IP` and `PORT_NUMBER` with the receiver's IP address and port number.
 
-## Contributing
-Contributions are welcome. Please follow the standard fork and pull request workflow.
+#### Receiving Messages 📨
+To receive a message:
+   ```bash
+   nx get msg PORT_NUMBER [-a]
+   ```
+Replace `PORT_NUMBER` with the desired port number.
+- Use `-a` for anonymous mode, hiding the sender's IP.
 
-## License
-This project is licensed under [Apache License 2.0](LICENSE). See the LICENSE file for details.
+### Options ⚙️
+- `-v`, `--version`: Displays the current version of the application.
+
+## 5. Contributing 🤝
+Contributions are welcome! Please follow the standard fork-and-pull-request workflow.
+
+## 6. License 📄
+This project is licensed under the [Apache License 2.0](LICENSE). See the LICENSE file for more details.
