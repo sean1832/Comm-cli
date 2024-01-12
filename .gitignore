@@ -2,5 +2,6 @@ venv/
 build/
 dist/
 test/
+.pytest_cache/
 *.egg-info/
 __pycache__/
