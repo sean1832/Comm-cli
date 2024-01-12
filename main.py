@@ -195,8 +195,12 @@ def recieve_file_udp(port, save_dir):
         print(f"File validation failed! {e}")
 
 def recieve_files_udp(port, save_dir):
-        while True:
-            recieve_file_udp(port, save_dir)
+        try:
+            while True:
+                recieve_file_udp(port, save_dir)
+        except KeyboardInterrupt:
+            print("Manual Exit.")
+            return
 
 def recieve_file_tcp(port, save_dir):
     server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -252,8 +256,12 @@ def recieve_file_tcp(port, save_dir):
         server_sock.close()
 
 def recieve_files_tcp(port, save_dir):
-    while True:
-        recieve_file_tcp(port, save_dir)
+    try:
+        while True:
+            recieve_file_tcp(port, save_dir)
+    except KeyboardInterrupt:
+        print("Manual Exit.")
+        return
 
 def get_local_ip(*args, **kwargs):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
