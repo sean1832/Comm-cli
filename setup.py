@@ -1,14 +1,14 @@
 from setuptools import setup
 
 setup(
-    name='udp-chat',
+    name='nx',
     version='0.0.5',
     author='Zeke Zhang',
-    description='cli chat application using udp',
+    description='Simple local network data transfer CLI. Supports file transfer (udp and tcp) and text transfer.',
     scripts=['main.py'],
     entry_points={
         'console_scripts': [
-            'udp-chat = main:main',
+            'nx = main:main',
         ],
     },
 )

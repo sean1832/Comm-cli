@@ -255,7 +255,7 @@ def recieve_files_tcp(port, save_dir):
     while True:
         recieve_file_tcp(port, save_dir)
 
-def get_local_ip():
+def get_local_ip(*args, **kwargs):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
         # doesn't even have to be reachable
@@ -265,7 +265,7 @@ def get_local_ip():
         IP = '127.0.0.1'
     finally:
         s.close()
-    return IP
+    print(f"{IP}")
 
 def receive_messages(args):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -307,10 +307,13 @@ def recieve_file(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description=f"UDP Chat Application v{version}")
+    parser = argparse.ArgumentParser(description=f"Network Data Exchanger (nx-cli) v{version}")
     parser.add_argument('-v', '--version', action='store_true', help='Print version')
-    parser.add_argument('-i', '--get-ip', action='store_true', help='Print local IP address')
     subparsers = parser.add_subparsers(dest='command')
+
+    # Get local IP command parser
+    get_ip_parser = subparsers.add_parser('ip')
+    get_ip_parser.set_defaults(func=get_local_ip)
 
     # Post command parser
     post_parser = subparsers.add_parser('post')
@@ -352,8 +355,6 @@ def main():
 
     if args.version:
         print(f"{version}")
-    elif args.get_ip:
-        print(f"{get_local_ip()}")
     elif hasattr(args, 'func'):
         args.func(args)
     else:
