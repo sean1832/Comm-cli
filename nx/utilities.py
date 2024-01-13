@@ -1,11 +1,14 @@
 import hashlib
 import json
 import socket
+import os
 
 import nx.progress_bar as pb
 
 def read_manifest():
-    with open('manifest.json', 'r') as f:
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    manifest_path = os.path.join(dir_path, 'manifest.json')
+    with open(manifest_path, 'r') as f:
         return json.load(f)
 
 def handshake_send(sock, ip, port, timeout=5):
