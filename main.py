@@ -229,29 +229,43 @@ def recieve_files_udp(port, save_dir, verbose=False):
         print("Manual Exit.")
         return
 
-def recieve_file_tcp(port, save_dir):
+def recieve_file_tcp(port, save_dir, verbose=False):
     server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    if verbose: print("TCP server socket created.")
     server_sock.bind(('0.0.0.0', port))
     server_sock.listen(1)
     print(f"Listening for file on port {port}...")
 
     client_sock, address = server_sock.accept()
-    print(f"Receiving file from {address}...")
+    if verbose: print(f"Connection established with {address}.")
+    if verbose: print('TCP client socket created.')
 
     # get metadata
+    msg = "Waiting for metadata..."
+    if verbose: print(msg, end='\r')
     metadata = client_sock.recv(1024).decode()
+    if verbose: print("Metadata received.".ljust(len(msg)))
+
     try:
+        msg = "decoding metadata..."
+        if verbose: print(msg, end='\r')
         metadata = json.loads(metadata)
         file_name = metadata['name']
         file_size = metadata['size']
         file_hash = metadata['hash']
+        if verbose: print("Metadata decoded.".ljust(len(msg)))
 
+        # send acknowledgment
+        msg = "Sending acknowledgment..."
+        if verbose: print(msg, end='\r')
         client_sock.sendall(b"ACK")
+        if verbose: print("Acknowledgment sent.".ljust(len(msg)))
     except Exception as e:
         print(f"Failed to decode metadata: {e}")
         print(f"metadata: {metadata}")
         server_sock.close()
         client_sock.close()
+        print("TCP Socket closed.")
         return
      
     # receive file
@@ -259,6 +273,7 @@ def recieve_file_tcp(port, save_dir):
         # create directory if it doesn't exist
         os.makedirs(save_dir, exist_ok=True)
         with open(os.path.join(save_dir, file_name), 'wb') as f:
+            if verbose: print(f"Receiving file from {address}...")
             while True:
                 data = client_sock.recv(1024)
                 if not data:
@@ -270,9 +285,11 @@ def recieve_file_tcp(port, save_dir):
                 if f.tell() == file_size:
                     print(f"\ncomplete. [{file_name}]")
                     break
-        print(f"Validating file...")
+        msg = 'Validating file...'
+        if verbose: print(msg, end='\r')
         if validate_hash(os.path.join(save_dir, file_name), file_hash):
-            print(f"File validated.")
+            if verbose: print(f"File validated.".ljust(len(msg)))
+            else: pass
         else:
             print(f"File validation failed! Expected {file_hash} but got {get_hash(os.path.join(save_dir, file_name))}.")
     except Exception as e:
@@ -280,12 +297,15 @@ def recieve_file_tcp(port, save_dir):
         return
     finally:
         client_sock.close()
+        if verbose: print("TCP client socket closed.")
         server_sock.close()
+        if verbose: print("TCP server socket closed.")
+        
 
-def recieve_files_tcp(port, save_dir):
+def recieve_files_tcp(port, save_dir, verbose=False):
     try:
         while True:
-            recieve_file_tcp(port, save_dir)
+            recieve_file_tcp(port, save_dir, verbose=verbose)
     except KeyboardInterrupt:
         print("Manual Exit.")
         return
@@ -329,7 +349,10 @@ def send_messages(args):
 def recieve_file(args):
     port = args.port
     file_dir = args.file_dir
-    verbose = args.verbose
+    if args.verbose:
+        verbose = True
+    else:
+        verbose = False
     if args.udp:
         if args.recursive:
             recieve_files_udp(port, file_dir, verbose=verbose)
