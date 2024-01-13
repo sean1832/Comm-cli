@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import math
 import socket
 import argparse
 import os
@@ -8,8 +7,8 @@ import json
 from sys import exception
 import sys
 
-import progress_bar as pb
-import utilities as util
+import nx.progress_bar as pb
+import nx.utilities as util
 
 version = "0.0.8"
 phrase = {
