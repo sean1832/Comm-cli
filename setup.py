@@ -1,10 +1,14 @@
 from setuptools import setup
+import json
+
+manifest = json.load(open('manifest.json', 'r'))
 
 setup(
-    name='nx',
-    version='0.0.9',
-    author='Zeke Zhang',
-    description='Simple local network data transfer CLI. Supports file transfer (udp and tcp) and text transfer.',
+    name=manifest['name'],
+    version=manifest['version'],
+    author=manifest['author'],
+    description=manifest['description'],
+    url=manifest['url'],
     entry_points={
         'console_scripts': [
             'nx = nx.main:main',
