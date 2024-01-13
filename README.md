@@ -8,7 +8,7 @@ Network Data Exchanger (nx-cli) is a versatile command-line tool 🛠️ for sen
 
 - **File Sharing:** Quickly transfer files between computers without the need for USB drives or third-party websites like emails or messaging apps.
 
-- **UDP and TCP Protocol Support:** Flexibility to choose between UDP for faster transfers or TCP for more reliable transmission. *(UDP is the default protocol, but TCP is recommended for file sharing mode)*
+- **UDP and TCP Protocol Support:** Flexibility to choose between UDP for faster transfers or TCP for more reliable transmission. *(TCP is the default protocol)*
 
 - **Local IP Retrieval:** Conveniently find out your computer's local IP address without needing to run `ipconfig` or `ifconfig`.
 
@@ -46,20 +46,21 @@ Retrieve your computer's local IP address:
 
 To send a file:
    ```bash
-   nx post file RECEIVER_IP PORT_NUMBER FILE_PATH [--tcp]
+   nx post file RECEIVER_IP PORT_NUMBER FILE_PATH [--udp]
    ```
 Replace `RECEIVER_IP`, `PORT_NUMBER`, and `FILE_PATH` with the appropriate values.
-- Use `--tcp` for TCP transmission.
+- Use `--udp` for UDP transmission.
 > it is recommended to use TCP for file transfers to ensure reliability. UDP is faster but may result in data loss.
 
 #### Receiving Files 📥
 To receive a file:
    ```bash
-   nx get file PORT_NUMBER SAVE_DIRECTORY [--tcp] [--recursive]
+   nx get file PORT_NUMBER SAVE_DIRECTORY [--udp] [--recursive]
    ```
-Replace `PORT_NUMBER` and `SAVE_DIRECTORY` with the desired port and directory path.
-- Use `--tcp` for TCP transmission. *(If sender uses `tcp`, the receiver must also use `tcp` to receive data.)*
-- Use `--recursive` for continuous reception.
+Replace `PORT_NUMBER` and `SAVE_DIRECTORY` with the desired port and directory path. 
+> `.` can be used to save the file in the current directory.
+- Use `--udp` for UDP transmission. *(If sender uses `udp`, the receiver must also use `udp` to receive data.)*
+- Use `-r` or `--recursive` for continuous reception.
 
 #### Sending Messages 💬
 To send a message:
