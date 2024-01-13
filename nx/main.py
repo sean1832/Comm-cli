@@ -4,9 +4,7 @@ import argparse
 import os
 import hashlib
 import json
-from sys import exception
 import sys
-from webbrowser import get
 
 import nx.progress_bar as pb
 import nx.utilities as util
