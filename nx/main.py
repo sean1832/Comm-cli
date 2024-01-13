@@ -6,11 +6,12 @@ import hashlib
 import json
 from sys import exception
 import sys
+from webbrowser import get
 
 import nx.progress_bar as pb
 import nx.utilities as util
 
-version = "0.0.8"
+version = "0.0.9"
 phrase = {
     'exit': "EXIT",
 }
@@ -68,7 +69,7 @@ def get_hash(path):
         data = f.read()
         return hashlib.md5(data).hexdigest()
 
-def send_file_udp(ip, port, file_path, verbose=False):
+def send_file_udp(ip, port, file_path, chunk, verbose=False):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     if verbose: print("UDP Socket created.")
     if verbose: print(f"Sending {file_path} to {ip}:{port}")
@@ -97,7 +98,7 @@ def send_file_udp(ip, port, file_path, verbose=False):
     if verbose: print("Sending file...")
     with open(file_path, 'rb') as f:
         while True:
-            data = f.read(1024)
+            data = f.read(chunk)
             if not data:
                 break
             sock.sendto(data, (ip, port))
@@ -106,7 +107,7 @@ def send_file_udp(ip, port, file_path, verbose=False):
     print(f"\ncomplete. [{file_path}]")
 
 
-def send_file_tcp(ip, port, file_path, verbose=False):
+def send_file_tcp(ip, port, file_path, chunk, verbose=False):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     if verbose: print("TCP Socket created.")
     if verbose: print(f"Sending {file_path} to {ip}:{port}")
@@ -143,7 +144,7 @@ def send_file_tcp(ip, port, file_path, verbose=False):
         if verbose: print("Sending file...")
         with open(file_path, 'rb') as f:
             while True:
-                data = f.read(1024)
+                data = f.read(chunk)
                 if not data:
                     break
                 sock.sendall(data)
@@ -163,14 +164,15 @@ def send_file(args):
     port = args.port
     file_path = args.file_path
     verbose = args.verbose
+    chunk = args.chunk
     if args.udp: 
-        send_file_udp(ip, port, file_path, verbose=verbose)
+        send_file_udp(ip, port, file_path, chunk, verbose=verbose)
     else:
-        send_file_tcp(ip, port, file_path, verbose=verbose)
+        send_file_tcp(ip, port, file_path, chunk, verbose=verbose)
     
 
 
-def recieve_file_udp(port, save_dir, verbose=False):
+def recieve_file_udp(port, save_dir, chunk, verbose=False):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     if verbose: print("UDP Socket created.")
     sock.bind(('0.0.0.0', port))
@@ -205,7 +207,7 @@ def recieve_file_udp(port, save_dir, verbose=False):
         with open(file_path, 'wb') as f:
             if verbose: print(f"Receiving file from {address}...")
             while True:
-                data, address = sock.recvfrom(1024)
+                data, address = sock.recvfrom(chunk)
                 if not data:
                     break
                 f.write(data)
@@ -236,15 +238,15 @@ def recieve_file_udp(port, save_dir, verbose=False):
     except Exception as e:
         print(f"File validation failed! {e}")
 
-def recieve_files_udp(port, save_dir, verbose=False):
+def recieve_files_udp(port, save_dir, chunk, verbose=False):
     try:
         while True:
-            recieve_file_udp(port, save_dir, verbose=verbose)
+            recieve_file_udp(port, save_dir, chunk, verbose=verbose)
     except KeyboardInterrupt:
         print("Manual Exit.")
         return
 
-def recieve_file_tcp(port, save_dir, verbose=False):
+def recieve_file_tcp(port, save_dir, chunk, verbose=False):
     server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     if verbose: print("TCP server socket created.")
     server_sock.bind(('0.0.0.0', port))
@@ -290,7 +292,7 @@ def recieve_file_tcp(port, save_dir, verbose=False):
         with open(os.path.join(save_dir, file_name), 'wb') as f:
             if verbose: print(f"Receiving file from {address}...")
             while True:
-                data = client_sock.recv(1024)
+                data = client_sock.recv(chunk)
                 if not data:
                     break
                 f.write(data)
@@ -318,10 +320,10 @@ def recieve_file_tcp(port, save_dir, verbose=False):
         if verbose: print("TCP server socket closed.")
         
 
-def recieve_files_tcp(port, save_dir, verbose=False):
+def recieve_files_tcp(port, save_dir, chunk, verbose=False):
     try:
         while True:
-            recieve_file_tcp(port, save_dir, verbose=verbose)
+            recieve_file_tcp(port, save_dir, chunk, verbose=verbose)
     except KeyboardInterrupt:
         print("Manual Exit.")
         return
@@ -365,20 +367,21 @@ def send_messages(args):
 def recieve_file(args):
     port = args.port
     file_dir = args.file_dir
+    chunk = args.chunk
     if args.verbose:
         verbose = True
     else:
         verbose = False
     if args.udp:
         if args.recursive:
-            recieve_files_udp(port, file_dir, verbose=verbose)
+            recieve_files_udp(port, file_dir, chunk, verbose=verbose)
         else:
-            recieve_file_udp(port, file_dir, verbose=verbose)
+            recieve_file_udp(port, file_dir, chunk, verbose=verbose)
     else:
         if args.recursive:
-            recieve_files_tcp(port, file_dir, verbose=verbose)
+            recieve_files_tcp(port, file_dir, chunk,  verbose=verbose)
         else:
-            recieve_file_tcp(port, file_dir, verbose=verbose)
+            recieve_file_tcp(port, file_dir, chunk, verbose=verbose)
 
 
 def main():
@@ -406,6 +409,7 @@ def main():
     post_file_parser.add_argument('port', type=int, help='Port number')
     post_file_parser.add_argument('file_path', type=str, help='File path to send')
     post_file_parser.add_argument('--udp', action='store_true', help='Use UDP instead of TCP. Faster but less reliable.')
+    post_file_parser.add_argument('-c', '--chunk', type=int, help='Chunk size in bytes. Default is 1024.', default=1024)
     post_file_parser.add_argument('--verbose', action='store_true', help='Print verbose output')
     post_file_parser.set_defaults(func=send_file)
 
@@ -425,6 +429,7 @@ def main():
     get_file_parser.add_argument('file_dir', type=str, help='File directory to save to')
     get_file_parser.add_argument('-r', '--recursive', action='store_true', help='Receive files recursively')
     get_file_parser.add_argument('--udp', action='store_true', help='Use UDP instead of TCP. Faster but less reliable.')
+    get_file_parser.add_argument('-c', '--chunk', type=int, help='Chunk size in bytes. Default is 1024.', default=1024)
     get_file_parser.add_argument('--verbose', action='store_true', help='Print verbose output')
     get_file_parser.set_defaults(func=recieve_file)
 
