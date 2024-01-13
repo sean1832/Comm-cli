@@ -43,18 +43,13 @@ def handshake_send(sock, ip, port, timeout=5):
     
 
 def handshake_receive(sock):
-    """
-    Perform a handshake between sender and receiver.
-    Returns True if the handshake is successful, False otherwise.
-    """
     try:
         data, address = sock.recvfrom(1024)
         if data.decode() == "handshake":
-            # Send acknowledgment
             sock.sendto(b"ack", address)
             return True
         return False
-    except exception as e:
+    except socket.error as e:
         print(f"Handshake failed: {e}")
         return False
 
