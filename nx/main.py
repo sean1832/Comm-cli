@@ -144,7 +144,7 @@ def send_file_tcp(ip, port, file_path, chunk, verbose=False):
                 # print progress
                 print_progress(f.tell(), file_size, verbose, unit='kb')
         print(f"\ncomplete. [{file_path}]") 
-    except Exception as e:
+    except socket.erro as e:
         print(f"\nError in sending file: {e}")
     finally:
         sock.close()
@@ -216,9 +216,12 @@ def recieve_file_udp(port, save_dir, chunk, verbose=False):
     except socket.timeout:
         print(f"File transfer timed out.")
         return
-    except Exception as e:
+    except socket.erro as e:
         print(f"File transfer failed: {e}")
         return
+    finally:
+        sock.close()
+        if verbose: print("UDP Socket closed.")
     
     msg = 'Validating file...'
     print(f"Validating file...", end='\r')
@@ -302,7 +305,7 @@ def recieve_file_tcp(port, save_dir, chunk, verbose=False):
             print(f"File validated.".ljust(len(msg)))
         else:
             print(f"File validation failed! Expected {file_hash} but got {get_hash(os.path.join(save_dir, file_name))}.")
-    except Exception as e:
+    except socket.erro as e:
         print(f"File transfer failed: {e}")
         return
     finally:
