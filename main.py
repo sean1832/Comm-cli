@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import math
 import socket
 import argparse
 import os
@@ -7,10 +8,20 @@ import json
 from sys import exception
 import sys
 
+import progress_bar as pb
+import utilities as util
+
 version = "0.0.7"
 phrase = {
     'exit': "EXIT",
 }
+
+def print_progress(iteration, total, verbose, unit='kb'):
+        sent_data = util.convert_byte(iteration, unit)
+        total_data = util.convert_byte(total, unit)
+        description = f"({total_data} kb)"
+        if verbose: description = f"({sent_data}/{total_data} {unit})"
+        pb.progress_bar(iteration, total, description=description)
 
 def handshake_send(sock, ip, port, timeout=5):
     """
@@ -92,7 +103,7 @@ def send_file_udp(ip, port, file_path, verbose=False):
                 break
             sock.sendto(data, (ip, port))
             # print progress
-            print(f"Progress: {f.tell()}/{file_size}", end='\r')
+            print_progress(f.tell(), file_size, verbose, unit='kb')
     print(f"\ncomplete. [{file_path}]")
 
 
@@ -137,8 +148,9 @@ def send_file_tcp(ip, port, file_path, verbose=False):
                 if not data:
                     break
                 sock.sendall(data)
+
                 # print progress
-                print(f"Progress: {f.tell()}/{file_size}", end='\r')
+                print_progress(f.tell(), file_size, verbose, unit='kb')
         print(f"\ncomplete. [{file_path}]") 
     except Exception as e:
         print(f"\nError in sending file: {e}")
@@ -198,8 +210,10 @@ def recieve_file_udp(port, save_dir, verbose=False):
                 if not data:
                     break
                 f.write(data)
+
                 # print progress
-                print(f"Progress: {f.tell()}/{file_size}", end='\r')
+                print_progress(f.tell(), file_size, verbose, unit='kb')
+
                 # set timeout to 3 seconds
                 sock.settimeout(3)
                 # check if file is complete
@@ -281,8 +295,10 @@ def recieve_file_tcp(port, save_dir, verbose=False):
                 if not data:
                     break
                 f.write(data)
+                
                 # print progress
-                print(f"Progress: {f.tell()}/{file_size}", end='\r')
+                print_progress(f.tell(), file_size, verbose, unit='kb')
+
                 # check if file is complete
                 if f.tell() == file_size:
                     print(f"\ncomplete. [{file_name}]")
