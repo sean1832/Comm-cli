@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
-from math import e
 import socket
 import argparse
 import os
 import hashlib
 import json
 from sys import exception
-import threading
+import sys
 
-version = "0.0.6"
+version = "0.0.7"
 phrase = {
     'exit': "EXIT",
 }
@@ -59,27 +58,34 @@ def get_hash(path):
         data = f.read()
         return hashlib.md5(data).hexdigest()
 
-def send_file_udp(ip, port, file_path):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    print(f"Sending {file_path} to {ip}:{port}")
+def send_file_udp(ip, port, file_path, verbose=False):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    if verbose: print("UDP Socket created.")
+    if verbose: print(f"Sending {file_path} to {ip}:{port}")
 
-    print(f"Performing handshake...")
+    if verbose: print(f"Performing handshake...")
     if not handshake_send(sock, ip, port, timeout=0.5):
         print("Ensure that the receiver is open and listening on the correct port.")
         return
-    print(f"Handshake successful.")
+    if verbose: print(f"Handshake successful.")
 
+    # send metadata
+    file_name = os.path.basename(file_path)
+    file_size = os.path.getsize(file_path)
+    file_hash = get_hash(file_path)
+    metadata = {
+        'name': file_name,
+        'size': file_size,
+        'hash': file_hash
+    }
+    msg = "Sending metadata..."
+    if verbose: print(f"Sending metadata...", end='\r')
+    sock.sendto(json.dumps(metadata).encode(), (ip, port))
+    if verbose: print("Metadata sent.".ljust(len(msg)))
+
+    # send file
+    if verbose: print("Sending file...")
     with open(file_path, 'rb') as f:
-        # get file size and hash
-        file_name = os.path.basename(file_path)
-        file_size = os.path.getsize(file_path)
-        file_hash = get_hash(file_path)
-        metadata = {
-            'name': file_name,
-            'size': file_size,
-            'hash': file_hash
-        }
-        sock.sendto(json.dumps(metadata).encode(), (ip, port))
         while True:
             data = f.read(1024)
             if not data:
@@ -90,12 +96,16 @@ def send_file_udp(ip, port, file_path):
     print(f"\ncomplete. [{file_path}]")
 
 
-def send_file_tcp(ip, port, file_path):
+def send_file_tcp(ip, port, file_path, verbose=False):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    print(f"Sending {file_path} to {ip}:{port}")
+    if verbose: print("TCP Socket created.")
+    if verbose: print(f"Sending {file_path} to {ip}:{port}")
     try:
-        print("Connecting...")
+        msg = "Connecting..."
+        print(msg, end='\r')
+        sys.stdout.flush() # Ensure "Connecting..." is printed immediately
         sock.connect((ip, port))
+        print("Connected.".ljust(len(msg)))
 
         # prepare metadata
         file_size = os.path.getsize(file_path)
@@ -105,15 +115,22 @@ def send_file_tcp(ip, port, file_path):
             'hash': get_hash(file_path)
         }
         # send metadata
+        msg = "Sending metadata..."
+        if verbose: print(msg, end='\r')
         sock.sendall(json.dumps(metadata).encode())
+        if verbose: print("Metadata sent.".ljust(len(msg)))
 
         # wait for acknowledgment
+        msg = "Waiting for acknowledgment..."
+        if verbose: print(msg, end='\r')
         ack = sock.recv(1024)
         if ack.decode() != "ACK":
             print("Failed to receive acknowledgment.")
             return
+        if verbose: print("Acknowledgment received.".ljust(len(msg)))
         
         # send file
+        if verbose: print("Sending file...")
         with open(file_path, 'rb') as f:
             while True:
                 data = f.read(1024)
@@ -127,29 +144,36 @@ def send_file_tcp(ip, port, file_path):
         print(f"\nError in sending file: {e}")
     finally:
         sock.close()
+        if verbose: print("TCP Socket closed.")
 
 
 def send_file(args):
     ip = args.ip
     port = args.port
     file_path = args.file_path
+    verbose = args.verbose
     if args.udp: 
-        send_file_udp(ip, port, file_path)
+        send_file_udp(ip, port, file_path, verbose=verbose)
     else:
-        send_file_tcp(ip, port, file_path)
+        send_file_tcp(ip, port, file_path, verbose=verbose)
     
 
 
-def recieve_file_udp(port, save_dir):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+def recieve_file_udp(port, save_dir, verbose=False):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    if verbose: print("UDP Socket created.")
     sock.bind(('0.0.0.0', port))
     print(f"Listening for file on port {port}...")
 
+    if verbose: print('Performing handshake...')
     if not handshake_receive(sock):
         print("Handshake failed.")
         return
-    
+    if verbose: print("Handshake successful.")
+
     # get metadata
+    msg = "Waiting for metadata..."
+    if verbose: print(msg, end='\r')
     metadata, address = sock.recvfrom(1024)
     try:
         metadata = json.loads(metadata.decode())
@@ -160,7 +184,7 @@ def recieve_file_udp(port, save_dir):
     file_name = metadata['name']
     file_size = metadata['size']
     file_hash = metadata['hash']
-    print(f"Receiving file from {address}...")
+    if verbose: print("Metadata received.".ljust(len(msg)))
 
     file_path = os.path.join(save_dir, file_name)
     # create directory if it doesn't exist
@@ -168,6 +192,7 @@ def recieve_file_udp(port, save_dir):
 
     try:
         with open(file_path, 'wb') as f:
+            if verbose: print(f"Receiving file from {address}...")
             while True:
                 data, address = sock.recvfrom(1024)
                 if not data:
@@ -187,19 +212,19 @@ def recieve_file_udp(port, save_dir):
     except Exception as e:
         print(f"File transfer failed: {e}")
         return
-    print(f"Validating file...")
+    if verbose: print(f"Validating file...")
     try:
         if validate_hash(file_path, file_hash):
-            print(f"File validated.")
+            if verbose: print(f"File validated.")
         else:
             print(f"File validation failed! Expected {file_hash} but got {get_hash(file_path)}.")
     except Exception as e:
         print(f"File validation failed! {e}")
 
-def recieve_files_udp(port, save_dir):
+def recieve_files_udp(port, save_dir, verbose=False):
     try:
         while True:
-            recieve_file_udp(port, save_dir)
+            recieve_file_udp(port, save_dir, verbose=verbose)
     except KeyboardInterrupt:
         print("Manual Exit.")
         return
@@ -304,16 +329,17 @@ def send_messages(args):
 def recieve_file(args):
     port = args.port
     file_dir = args.file_dir
+    verbose = args.verbose
     if args.udp:
         if args.recursive:
-            recieve_files_udp(port, file_dir)
+            recieve_files_udp(port, file_dir, verbose=verbose)
         else:
-            recieve_file_udp(port, file_dir)
+            recieve_file_udp(port, file_dir, verbose=verbose)
     else:
         if args.recursive:
-            recieve_files_tcp(port, file_dir)
+            recieve_files_tcp(port, file_dir, verbose=verbose)
         else:
-            recieve_file_tcp(port, file_dir)
+            recieve_file_tcp(port, file_dir, verbose=verbose)
 
 
 def main():
@@ -341,6 +367,7 @@ def main():
     post_file_parser.add_argument('port', type=int, help='Port number')
     post_file_parser.add_argument('file_path', type=str, help='File path to send')
     post_file_parser.add_argument('--udp', action='store_true', help='Use UDP instead of TCP. Faster but less reliable.')
+    post_file_parser.add_argument('--verbose', action='store_true', help='Print verbose output')
     post_file_parser.set_defaults(func=send_file)
 
     # Get command parser
@@ -359,6 +386,7 @@ def main():
     get_file_parser.add_argument('file_dir', type=str, help='File directory to save to')
     get_file_parser.add_argument('-r', '--recursive', action='store_true', help='Receive files recursively')
     get_file_parser.add_argument('--udp', action='store_true', help='Use UDP instead of TCP. Faster but less reliable.')
+    get_file_parser.add_argument('--verbose', action='store_true', help='Print verbose output')
     get_file_parser.set_defaults(func=recieve_file)
 
     args = parser.parse_args()
