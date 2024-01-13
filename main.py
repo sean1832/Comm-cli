@@ -212,10 +212,12 @@ def recieve_file_udp(port, save_dir, verbose=False):
     except Exception as e:
         print(f"File transfer failed: {e}")
         return
-    if verbose: print(f"Validating file...")
+    
+    msg = 'Validating file...'
+    print(f"Validating file...", end='\r')
     try:
         if validate_hash(file_path, file_hash):
-            if verbose: print(f"File validated.")
+            print(f"File validated.".ljust(len(msg)))
         else:
             print(f"File validation failed! Expected {file_hash} but got {get_hash(file_path)}.")
     except Exception as e:
@@ -286,10 +288,9 @@ def recieve_file_tcp(port, save_dir, verbose=False):
                     print(f"\ncomplete. [{file_name}]")
                     break
         msg = 'Validating file...'
-        if verbose: print(msg, end='\r')
+        print(msg, end='\r')
         if validate_hash(os.path.join(save_dir, file_name), file_hash):
-            if verbose: print(f"File validated.".ljust(len(msg)))
-            else: pass
+            print(f"File validated.".ljust(len(msg)))
         else:
             print(f"File validation failed! Expected {file_hash} but got {get_hash(os.path.join(save_dir, file_name))}.")
     except Exception as e:
