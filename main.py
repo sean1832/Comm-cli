@@ -133,10 +133,10 @@ def send_file(args):
     ip = args.ip
     port = args.port
     file_path = args.file_path
-    if args.tcp: 
-        send_file_tcp(ip, port, file_path)
-    else:
+    if args.udp: 
         send_file_udp(ip, port, file_path)
+    else:
+        send_file_tcp(ip, port, file_path)
     
 
 
