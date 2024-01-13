@@ -53,11 +53,8 @@ def handshake_receive(sock):
         print(f"Handshake failed: {e}")
         return False
 
-def validate_hash(path, hash):
-    if get_hash(path) == hash:
-        return True
-    else:
-        return False
+def validate_hash(path, hash_value):
+    return get_hash(path) == hash_value
 
 def get_hash(path):
     with open(path, 'rb') as f:
