@@ -8,7 +8,7 @@ import json
 from sys import exception
 import threading
 
-version = "0.0.5"
+version = "0.0.6"
 phrase = {
     'exit': "EXIT",
 }
@@ -304,16 +304,16 @@ def send_messages(args):
 def recieve_file(args):
     port = args.port
     file_dir = args.file_dir
-    if args.tcp:
-        if args.recursive:
-            recieve_files_tcp(port, file_dir)
-        else:
-            recieve_file_tcp(port, file_dir)
-    else:
+    if args.udp:
         if args.recursive:
             recieve_files_udp(port, file_dir)
         else:
             recieve_file_udp(port, file_dir)
+    else:
+        if args.recursive:
+            recieve_files_tcp(port, file_dir)
+        else:
+            recieve_file_tcp(port, file_dir)
 
 
 def main():
@@ -340,7 +340,7 @@ def main():
     post_file_parser.add_argument('ip', type=str, help='Target IP address')
     post_file_parser.add_argument('port', type=int, help='Port number')
     post_file_parser.add_argument('file_path', type=str, help='File path to send')
-    post_file_parser.add_argument('--tcp', action='store_true', help='Use TCP instead of UDP. More reliable but slower.')
+    post_file_parser.add_argument('--udp', action='store_true', help='Use UDP instead of TCP. Faster but less reliable.')
     post_file_parser.set_defaults(func=send_file)
 
     # Get command parser
@@ -358,7 +358,7 @@ def main():
     get_file_parser.add_argument('port', type=int, help='Port number')
     get_file_parser.add_argument('file_dir', type=str, help='File directory to save to')
     get_file_parser.add_argument('-r', '--recursive', action='store_true', help='Receive files recursively')
-    get_file_parser.add_argument('--tcp', action='store_true', help='Use TCP instead of UDP. More reliable but slower.')
+    get_file_parser.add_argument('--udp', action='store_true', help='Use UDP instead of TCP. Faster but less reliable.')
     get_file_parser.set_defaults(func=recieve_file)
 
     args = parser.parse_args()
