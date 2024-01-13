@@ -11,7 +11,7 @@ import sys
 import progress_bar as pb
 import utilities as util
 
-version = "0.0.7"
+version = "0.0.8"
 phrase = {
     'exit': "EXIT",
 }
@@ -295,7 +295,7 @@ def recieve_file_tcp(port, save_dir, verbose=False):
                 if not data:
                     break
                 f.write(data)
-                
+
                 # print progress
                 print_progress(f.tell(), file_size, verbose, unit='kb')
 
