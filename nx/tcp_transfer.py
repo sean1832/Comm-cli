@@ -71,7 +71,7 @@ def recieve_file_tcp(port, save_dir, chunk, verbose=False):
     print(f"Listening for file on port {port}...")
 
     client_sock, address = server_sock.accept()
-    if verbose: print(f"Connection established with {address}.")
+    print(f"Connection established with {address}.")
     if verbose: print('TCP client socket created.')
 
     # get metadata
