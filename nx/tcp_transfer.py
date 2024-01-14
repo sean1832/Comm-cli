@@ -2,6 +2,7 @@ import socket
 import json
 import os
 import sys
+import time
 
 from . import utilities as utils
 
@@ -41,6 +42,8 @@ def send_file_tcp(ip, port, file_path, chunk, verbose=False):
         
         # send file
         if verbose: print("Sending file...")
+
+        start_time = time.time()
         with open(file_path, 'rb') as f:
             while True:
                 data = f.read(chunk)
@@ -50,7 +53,9 @@ def send_file_tcp(ip, port, file_path, chunk, verbose=False):
 
                 # print progress
                 utils.print_progress(f.tell(), file_size, verbose, unit='auto')
+        end_time = time.time()
         print(f"\ncomplete. [{file_path}]") 
+        print(f"Time taken: {end_time - start_time} seconds")
     except socket.error as e:
         print(f"\nError in sending file: {e}")
     finally:
@@ -101,6 +106,9 @@ def recieve_file_tcp(port, save_dir, chunk, verbose=False):
     try:
         # create directory if it doesn't exist
         os.makedirs(save_dir, exist_ok=True)
+        # TODO: Send directory
+
+        start_time = time.time()
         with open(os.path.join(save_dir, file_name), 'wb') as f:
             if verbose: print(f"Receiving file from {address}...")
             while True:
@@ -116,6 +124,9 @@ def recieve_file_tcp(port, save_dir, chunk, verbose=False):
                 if f.tell() == file_size:
                     print(f"\ncomplete. [{file_name}]")
                     break
+        end_time = time.time()
+        print(f"Time taken: {end_time - start_time} seconds")
+        
         msg = 'Validating file...'
         print(msg, end='\r')
         if utils.validate_hash(os.path.join(save_dir, file_name), file_hash):

@@ -1,6 +1,7 @@
 import socket
 import json
 import os
+import time
 
 from nx import utilities as utils
 
@@ -32,6 +33,7 @@ def send_file_udp(ip, port, file_path, chunk, verbose=False):
 
     # send file
     if verbose: print("Sending file...")
+    start_time = time.time()
     with open(file_path, 'rb') as f:
         while True:
             data = f.read(chunk)
@@ -40,7 +42,9 @@ def send_file_udp(ip, port, file_path, chunk, verbose=False):
             sock.sendto(data, (ip, port))
             # print progress
             utils.print_progress(f.tell(), file_size, verbose, unit='auto')
+    end_time = time.time()
     print(f"\ncomplete. [{file_path}]")
+    print(f"Time taken: {end_time - start_time} seconds")
 
 def recieve_file_udp(port, save_dir, chunk, verbose=False):
     chunk = chunk * 1024 # convert to bytes
@@ -74,6 +78,7 @@ def recieve_file_udp(port, save_dir, chunk, verbose=False):
     # create directory if it doesn't exist
     os.makedirs(save_dir, exist_ok=True)
 
+    start_time = time.time()
     try:
         with open(file_path, 'wb') as f:
             if verbose: print(f"Receiving file from {address}...")
@@ -92,6 +97,8 @@ def recieve_file_udp(port, save_dir, chunk, verbose=False):
                 if f.tell() == file_size:
                     print(f"\ncomplete. [{file_path}]")
                     break
+        end_time = time.time()
+        print(f"Time taken: {end_time - start_time} seconds")
     except socket.timeout:
         print(f"File transfer timed out.")
         return
