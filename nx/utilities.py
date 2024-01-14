@@ -48,11 +48,11 @@ def get_hash(path):
         data = f.read()
         return hashlib.md5(data).hexdigest()
 
-def print_progress(iteration, total, verbose, unit='kb'):
+def print_progress(iteration, total, verbose, unit='auto'):
         sent_data = convert_byte(iteration, unit)
         total_data = convert_byte(total, unit)
-        description = f"({total_data} kb)"
-        if verbose: description = f"({sent_data}/{total_data} {unit})"
+        description = f"({total_data[0]} {total_data[1]})"
+        if verbose: description = f"({sent_data}/{total_data} {total_data[1]})"
         pb.progress_bar(iteration, total, description=description)
 
 
@@ -61,13 +61,26 @@ def convert_byte(byte, unit, percision: int=2):
     '''
     Convert byte to KB, MB, GB
     '''
-    unit = unit.upper()
+    unit = unit.lower()
 
-    if unit == 'KB':
-        return round(byte / 1024, percision)
-    elif unit == 'MB':
-        return round(byte / (1024 * 1024), percision)
-    elif unit == 'GB':
-        return round(byte / (1024 * 1024 * 1024), percision)
+    kb = byte / 1024
+    mb = kb / 1024
+    gb = mb / 1024
+
+    if unit == 'kb':
+        return round(kb, percision), 'kb'
+    elif unit == 'mb':
+        return round(mb, percision), 'mb'
+    elif unit == 'gb':
+        return round(gb, percision), 'gb'
+    elif unit == 'auto':
+        if gb > 1:
+            return round(gb, percision), 'gb'
+        elif mb > 1:
+            return round(mb, percision), 'mb'
+        elif kb > 1:
+            return round(kb, percision), 'kb'
+        else:
+            return round(byte, percision), 'b'
     else:
         raise ValueError(f'Invalid unit {unit}')

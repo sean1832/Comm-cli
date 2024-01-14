@@ -39,7 +39,7 @@ def send_file_udp(ip, port, file_path, chunk, verbose=False):
                 break
             sock.sendto(data, (ip, port))
             # print progress
-            utils.print_progress(f.tell(), file_size, verbose, unit='kb')
+            utils.print_progress(f.tell(), file_size, verbose, unit='auto')
     print(f"\ncomplete. [{file_path}]")
 
 def recieve_file_udp(port, save_dir, chunk, verbose=False):
@@ -84,7 +84,7 @@ def recieve_file_udp(port, save_dir, chunk, verbose=False):
                 f.write(data)
 
                 # print progress
-                utils.print_progress(f.tell(), file_size, verbose, unit='kb')
+                utils.print_progress(f.tell(), file_size, verbose, unit='auto')
 
                 # set timeout to 3 seconds
                 sock.settimeout(3)

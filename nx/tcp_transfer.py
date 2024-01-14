@@ -49,7 +49,7 @@ def send_file_tcp(ip, port, file_path, chunk, verbose=False):
                 sock.sendall(data)
 
                 # print progress
-                utils.print_progress(f.tell(), file_size, verbose, unit='kb')
+                utils.print_progress(f.tell(), file_size, verbose, unit='auto')
         print(f"\ncomplete. [{file_path}]") 
     except socket.error as e:
         print(f"\nError in sending file: {e}")
@@ -110,7 +110,7 @@ def recieve_file_tcp(port, save_dir, chunk, verbose=False):
                 f.write(data)
 
                 # print progress
-                utils.print_progress(f.tell(), file_size, verbose, unit='kb')
+                utils.print_progress(f.tell(), file_size, verbose, unit='auto')
 
                 # check if file is complete
                 if f.tell() == file_size:
