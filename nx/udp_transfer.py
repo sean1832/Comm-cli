@@ -5,6 +5,7 @@ import os
 from nx import utilities as utils
 
 def send_file_udp(ip, port, file_path, chunk, verbose=False):
+    chunk = chunk * 1024 # convert to bytes
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     if verbose: print("UDP Socket created.")
     if verbose: print(f"Sending {file_path} to {ip}:{port}")
@@ -42,6 +43,7 @@ def send_file_udp(ip, port, file_path, chunk, verbose=False):
     print(f"\ncomplete. [{file_path}]")
 
 def recieve_file_udp(port, save_dir, chunk, verbose=False):
+    chunk = chunk * 1024 # convert to bytes
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     if verbose: print("UDP Socket created.")
     sock.bind(('0.0.0.0', port))

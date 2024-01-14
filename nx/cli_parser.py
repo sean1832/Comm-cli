@@ -28,7 +28,7 @@ def build_parser():
     post_file_parser.add_argument('port', type=int, help='Port number')
     post_file_parser.add_argument('file_path', type=str, help='File path to send')
     post_file_parser.add_argument('--udp', action='store_true', help='Use UDP instead of TCP. Faster but less reliable.')
-    post_file_parser.add_argument('-c', '--chunk', type=int, help='Chunk size in bytes. Default is 1024.', default=1024)
+    post_file_parser.add_argument('-c', '--chunk', type=int, help='Chunk size in kb for file transfer. Default 4. Recommended between 4 to 64.', default=4)
     post_file_parser.add_argument('--verbose', action='store_true', help='Print verbose output')
     post_file_parser.set_defaults(func=send_file)
 
@@ -48,7 +48,7 @@ def build_parser():
     get_file_parser.add_argument('file_dir', type=str, help='File directory to save to')
     get_file_parser.add_argument('-r', '--recursive', action='store_true', help='Receive files recursively')
     get_file_parser.add_argument('--udp', action='store_true', help='Use UDP instead of TCP. Faster but less reliable.')
-    get_file_parser.add_argument('-c', '--chunk', type=int, help='Chunk size in bytes for file transfer. Default 4096. Recommended between 4096 to 65536.', default=4096)
+    get_file_parser.add_argument('-c', '--chunk', type=int, help='Chunk size in kb for file transfer. Default 4. Recommended between 4 to 64.', default=4)
     get_file_parser.add_argument('--verbose', action='store_true', help='Print verbose output')
     get_file_parser.set_defaults(func=recieve_file)
 

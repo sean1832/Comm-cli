@@ -6,6 +6,7 @@ import sys
 from . import utilities as utils
 
 def send_file_tcp(ip, port, file_path, chunk, verbose=False):
+    chunk = chunk * 1024 # convert to bytes
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     if verbose: print("TCP Socket created.")
     if verbose: print(f"Sending {file_path} to {ip}:{port}")
@@ -57,6 +58,7 @@ def send_file_tcp(ip, port, file_path, chunk, verbose=False):
         if verbose: print("TCP Socket closed.")
 
 def recieve_file_tcp(port, save_dir, chunk, verbose=False):
+    chunk = chunk * 1024 # convert to bytes
     server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     if verbose: print("TCP server socket created.")
     server_sock.bind(('0.0.0.0', port))
