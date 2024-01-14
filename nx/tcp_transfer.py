@@ -24,7 +24,7 @@ def send_file_tcp(ip, port, file_path, chunk, verbose=False):
             if verbose: print("Path is a directory. Zipping...")
             file_path = utils.zip_dir(file_path, file_path + '.zip')
             print("") # newline
-            
+
         # prepare metadata
         file_size = os.path.getsize(file_path)
         metadata = {
@@ -148,6 +148,7 @@ def recieve_file_tcp(port, save_dir, chunk, verbose=False):
             print(msg, end='\r')
             utils.unzip_dir(os.path.join(save_dir, file_name), save_dir)
             print("Unzipped.".ljust(len(msg)))
+            os.remove(os.path.join(save_dir, file_name))
 
     except socket.error as e:
         print(f"File transfer failed: {e}")
