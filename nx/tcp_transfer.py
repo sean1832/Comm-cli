@@ -54,8 +54,8 @@ def send_file_tcp(ip, port, file_path, chunk, verbose=False):
                 # print progress
                 utils.print_progress(f.tell(), file_size, verbose, unit='auto')
         end_time = time.time()
-        print(f"\ncomplete. [{file_path}]") 
-        print(f"Time taken: {end_time - start_time} seconds")
+        print(f"\ncomplete in {round(end_time - start_time, 2)} seconds. [{file_path}]") 
+
     except socket.error as e:
         print(f"\nError in sending file: {e}")
     finally:
@@ -122,11 +122,10 @@ def recieve_file_tcp(port, save_dir, chunk, verbose=False):
 
                 # check if file is complete
                 if f.tell() == file_size:
-                    print(f"\ncomplete. [{file_name}]")
                     break
         end_time = time.time()
-        print(f"Time taken: {end_time - start_time} seconds")
-        
+        print(f"\ncomplete in {round(end_time - start_time, 2)} seconds. [{file_name}]") 
+
         msg = 'Validating file...'
         print(msg, end='\r')
         if utils.validate_hash(os.path.join(save_dir, file_name), file_hash):

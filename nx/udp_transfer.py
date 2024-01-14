@@ -43,8 +43,7 @@ def send_file_udp(ip, port, file_path, chunk, verbose=False):
             # print progress
             utils.print_progress(f.tell(), file_size, verbose, unit='auto')
     end_time = time.time()
-    print(f"\ncomplete. [{file_path}]")
-    print(f"Time taken: {end_time - start_time} seconds")
+    print(f"\ncomplete in {round(end_time - start_time, 2)} seconds. [{file_path}]") 
 
 def recieve_file_udp(port, save_dir, chunk, verbose=False):
     chunk = chunk * 1024 # convert to bytes
@@ -95,10 +94,9 @@ def recieve_file_udp(port, save_dir, chunk, verbose=False):
                 sock.settimeout(3)
                 # check if file is complete
                 if f.tell() == file_size:
-                    print(f"\ncomplete. [{file_path}]")
                     break
         end_time = time.time()
-        print(f"Time taken: {end_time - start_time} seconds")
+        print(f"\ncomplete in {round(end_time - start_time, 2)} seconds. [{file_path}]") 
     except socket.timeout:
         print(f"File transfer timed out.")
         return
