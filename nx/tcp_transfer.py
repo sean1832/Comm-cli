@@ -50,7 +50,7 @@ def send_file_tcp(ip, port, file_path, chunk, verbose=False):
                 # print progress
                 utils.print_progress(f.tell(), file_size, verbose, unit='kb')
         print(f"\ncomplete. [{file_path}]") 
-    except socket.erro as e:
+    except socket.error as e:
         print(f"\nError in sending file: {e}")
     finally:
         sock.close()
@@ -120,7 +120,7 @@ def recieve_file_tcp(port, save_dir, chunk, verbose=False):
             print(f"File validated.".ljust(len(msg)))
         else:
             print(f"File validation failed! Expected {file_hash} but got {utils.get_hash(os.path.join(save_dir, file_name))}.")
-    except socket.erro as e:
+    except socket.error as e:
         print(f"File transfer failed: {e}")
         return
     finally:

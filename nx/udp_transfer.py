@@ -93,7 +93,7 @@ def recieve_file_udp(port, save_dir, chunk, verbose=False):
     except socket.timeout:
         print(f"File transfer timed out.")
         return
-    except socket.erro as e:
+    except socket.error as e:
         print(f"File transfer failed: {e}")
         return
     finally:
