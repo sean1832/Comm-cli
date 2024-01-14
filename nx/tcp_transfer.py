@@ -14,16 +14,24 @@ def send_file_tcp(ip, port, file_path, chunk, verbose=False):
     try:
         msg = "Connecting..."
         print(msg, end='\r')
-        sys.stdout.flush() # Ensure "Connecting..." is printed immediately
+        sys.stdout.flush()
         sock.connect((ip, port))
         print("Connected.".ljust(len(msg)))
 
+        # check if path is a directory, if so zip it
+        is_dir = os.path.isdir(file_path)
+        if is_dir: 
+            if verbose: print("Path is a directory. Zipping...")
+            file_path = utils.zip_dir(file_path, file_path + '.zip')
+            print("") # newline
+            
         # prepare metadata
         file_size = os.path.getsize(file_path)
         metadata = {
             'name': os.path.basename(file_path),
             'size': file_size,
-            'hash': utils.get_hash(file_path)
+            'hash': utils.get_hash(file_path),
+            'is_dir': is_dir
         }
         # send metadata
         msg = "Sending metadata..."
@@ -52,7 +60,7 @@ def send_file_tcp(ip, port, file_path, chunk, verbose=False):
                 sock.sendall(data)
 
                 # print progress
-                utils.print_progress(f.tell(), file_size, verbose, unit='auto')
+                utils.print_progress(f.tell(), file_size, title='Sending', verbose=verbose, unit='auto')
         end_time = time.time()
         print(f"\ncomplete in {round(end_time - start_time, 2)} seconds. [{file_path}]") 
 
@@ -60,6 +68,7 @@ def send_file_tcp(ip, port, file_path, chunk, verbose=False):
         print(f"\nError in sending file: {e}")
     finally:
         sock.close()
+        if is_dir: os.remove(file_path)
         if verbose: print("TCP Socket closed.")
 
 def recieve_file_tcp(port, save_dir, chunk, verbose=False):
@@ -87,6 +96,7 @@ def recieve_file_tcp(port, save_dir, chunk, verbose=False):
         file_name = metadata['name']
         file_size = metadata['size']
         file_hash = metadata['hash']
+        is_dir = metadata['is_dir']
         if verbose: print("Metadata decoded.".ljust(len(msg)))
 
         # send acknowledgment
@@ -106,7 +116,6 @@ def recieve_file_tcp(port, save_dir, chunk, verbose=False):
     try:
         # create directory if it doesn't exist
         os.makedirs(save_dir, exist_ok=True)
-        # TODO: Send directory
 
         start_time = time.time()
         with open(os.path.join(save_dir, file_name), 'wb') as f:
@@ -118,7 +127,7 @@ def recieve_file_tcp(port, save_dir, chunk, verbose=False):
                 f.write(data)
 
                 # print progress
-                utils.print_progress(f.tell(), file_size, verbose, unit='auto')
+                utils.print_progress(f.tell(), file_size, title='Receiving', verbose=verbose, unit='auto')
 
                 # check if file is complete
                 if f.tell() == file_size:
@@ -132,6 +141,14 @@ def recieve_file_tcp(port, save_dir, chunk, verbose=False):
             print(f"File validated.".ljust(len(msg)))
         else:
             print(f"File validation failed! Expected {file_hash} but got {utils.get_hash(os.path.join(save_dir, file_name))}.")
+        
+        # Unpack zip file if it is a directory
+        if is_dir:
+            msg = "Data is a directory. Unzipping..."
+            print(msg, end='\r')
+            utils.unzip_dir(os.path.join(save_dir, file_name), save_dir)
+            print("Unzipped.".ljust(len(msg)))
+
     except socket.error as e:
         print(f"File transfer failed: {e}")
         return
