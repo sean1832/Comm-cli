@@ -6,7 +6,7 @@ import time
 
 from . import utilities as utils
 
-def send_file_tcp(ip, port, file_path, chunk, verbose=False):
+def send_file_tcp(ip, port, file_path, chunk, zip_mode=False, verbose=False):
     chunk = chunk * 1024 # convert to bytes
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     if verbose: print("TCP Socket created.")
@@ -14,16 +14,20 @@ def send_file_tcp(ip, port, file_path, chunk, verbose=False):
     try:
         msg = "Connecting..."
         print(msg, end='\r')
-        sys.stdout.flush()
         sock.connect((ip, port))
         print("Connected.".ljust(len(msg)))
 
         # check if path is a directory, if so zip it
         is_dir = os.path.isdir(file_path)
         if is_dir: 
-            if verbose: print("Path is a directory. Zipping...")
-            file_path = utils.zip_dir(file_path, file_path + '.zip')
-            print("") # newline
+            if zip_mode:
+                if verbose: print("Path is a directory. Zipping...")
+                file_path = utils.zip_dir(file_path, file_path + '.zip')
+                print("") # newline
+            else:
+                print("Path is a directory. Use -z or --zip to zip before sending.")
+                sock.close()
+                return
 
         # prepare metadata
         file_size = os.path.getsize(file_path)
@@ -33,6 +37,7 @@ def send_file_tcp(ip, port, file_path, chunk, verbose=False):
             'hash': utils.get_hash(file_path),
             'is_dir': is_dir
         }
+
         # send metadata
         msg = "Sending metadata..."
         if verbose: print(msg, end='\r')
@@ -68,7 +73,7 @@ def send_file_tcp(ip, port, file_path, chunk, verbose=False):
         print(f"\nError in sending file: {e}")
     finally:
         sock.close()
-        if is_dir: os.remove(file_path)
+        if is_dir and zip_mode and file_path.endswith('.zip'): os.remove(file_path)
         if verbose: print("TCP Socket closed.")
 
 def recieve_file_tcp(port, save_dir, chunk, verbose=False):
@@ -159,7 +164,7 @@ def recieve_file_tcp(port, save_dir, chunk, verbose=False):
         server_sock.close()
         if verbose: print("TCP server socket closed.")
 
-def recieve_files_tcp(port, save_dir, chunk, verbose=False):
+def recieve_files_tcp(port, save_dir, chunk, zip_mode=False, verbose=False):
     try:
         while True:
             recieve_file_tcp(port, save_dir, chunk, verbose=verbose)

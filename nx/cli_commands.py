@@ -23,10 +23,11 @@ def send_file(args):
     file_path = args.file_path
     verbose = args.verbose
     chunk = args.chunk
+    zip_mode = args.zip
     if args.udp: 
         send_file_udp(ip, port, file_path, chunk, verbose=verbose)
     else:
-        send_file_tcp(ip, port, file_path, chunk, verbose=verbose)
+        send_file_tcp(ip, port, file_path, chunk, zip_mode, verbose=verbose)
     
 
 def recieve_file(args):
@@ -44,6 +45,6 @@ def recieve_file(args):
             recieve_file_udp(port, file_dir, chunk, verbose=verbose)
     else:
         if args.recursive:
-            recieve_files_tcp(port, file_dir, chunk,  verbose=verbose)
+            recieve_files_tcp(port, file_dir, chunk, verbose=verbose)
         else:
             recieve_file_tcp(port, file_dir, chunk, verbose=verbose)

@@ -28,7 +28,8 @@ def build_parser():
     post_file_parser.add_argument('port', type=int, help='Port number')
     post_file_parser.add_argument('file_path', type=str, help='File path to send')
     post_file_parser.add_argument('--udp', action='store_true', help='Use UDP instead of TCP. Faster but less reliable.')
-    post_file_parser.add_argument('-c', '--chunk', type=int, help='Chunk size in kb for file transfer. Default 4. Recommended between 4 to 64.', default=4)
+    post_file_parser.add_argument('-c', '--chunk', type=int, help='Chunk size in kb for file transfer. Default 4. Recommended between 4 to 64 kb.', default=4)
+    post_file_parser.add_argument('-z', '--zip', action='store_true', help='Zip before sending. Only works for directories.')
     post_file_parser.add_argument('--verbose', action='store_true', help='Print verbose output')
     post_file_parser.set_defaults(func=send_file)
 
