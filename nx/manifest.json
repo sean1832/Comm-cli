@@ -1,6 +1,6 @@
 {
     "name": "nx",
-    "version": "0.2.1",
+    "version": "0.3.0",
     "description": "Simple local network data transfer CLI. Supports file transfer (udp and tcp) and text transfer.",
     "url": "https://github.com/sean1832/nx-cli",
     "author": "ZEKE ZHANG",
