@@ -1,7 +1,7 @@
 import argparse
 
-from nx.cli_commands import get_local_ip, send_messages, receive_messages, send_file, recieve_file
-from nx.utilities import read_manifest
+from nx.cli.cli_commands import get_local_ip, send_messages, receive_messages, send_file, recieve_file
+from nx.core.utilities import read_manifest
 
 def build_parser():
     parser = argparse.ArgumentParser(description=f"Network Data Exchanger (nx-cli) v{read_manifest()['version']}")

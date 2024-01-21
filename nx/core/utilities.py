@@ -4,10 +4,10 @@ import socket
 import os
 import zipfile
 
-import nx.progress_bar as pb
+from . import progress_bar as pb
 
 def read_manifest():
-    dir_path = os.path.dirname(os.path.realpath(__file__))
+    dir_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
     manifest_path = os.path.join(dir_path, 'manifest.json')
     with open(manifest_path, 'r') as f:
         return json.load(f)
@@ -46,7 +46,7 @@ def unzip_dir(zip_path, dir_path):
     with zipfile.ZipFile(zip_path, 'r') as zipf:
         zipf.extractall(dir_path)
     
-def handshake_send(sock, ip, port, timeout=5):
+def handshake_send(sock, ip, port, timeout: float|int=5):
     """
     Perform a handshake between sender and receiver.
     Returns True if the handshake is successful, False otherwise.

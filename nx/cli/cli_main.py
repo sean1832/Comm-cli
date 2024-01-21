@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from . import cli_parser as cli
-from . import utilities as utils
+from nx.core import utilities as utils
 
 manifest = utils.read_manifest()
 

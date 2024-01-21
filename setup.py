@@ -16,7 +16,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'nx = nx.main:main',
+            'nx = nx.cli.cli_main:main',
         ],
     },
 )

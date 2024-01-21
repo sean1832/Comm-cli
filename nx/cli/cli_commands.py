@@ -1,7 +1,7 @@
 import socket
-from nx.udp_transfer import send_file_udp, recieve_file_udp, recieve_files_udp
-from nx.tcp_transfer import send_file_tcp, recieve_file_tcp, recieve_files_tcp
-from nx.msg_transfer import send_messages, receive_messages
+from nx.core.udp_transfer import send_file_udp, recieve_file_udp, recieve_files_udp
+from nx.core.tcp_transfer import send_file_tcp, recieve_file_tcp, recieve_files_tcp
+from nx.core.msg_transfer import send_messages, receive_messages
 
 
 

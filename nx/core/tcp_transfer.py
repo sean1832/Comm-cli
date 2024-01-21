@@ -10,6 +10,7 @@ def send_file_tcp(ip, port, file_path, chunk, zip_mode=False, verbose=False):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     if verbose: print("TCP Socket created.")
     if verbose: print(f"Sending {file_path} to {ip}:{port}")
+    is_dir = os.path.isdir(file_path)
     try:
         msg = "Connecting..."
         print(msg, end='\r')
@@ -17,7 +18,6 @@ def send_file_tcp(ip, port, file_path, chunk, zip_mode=False, verbose=False):
         print("Connected.".ljust(len(msg)))
 
         # check if path is a directory, if so zip it
-        is_dir = os.path.isdir(file_path)
         if is_dir: 
             if zip_mode:
                 if verbose: print("Path is a directory. Zipping...")

@@ -3,7 +3,7 @@ import json
 import os
 import time
 
-from nx import utilities as utils
+from . import utilities as utils
 
 def send_file_udp(ip, port, file_path, chunk, verbose=False):
     chunk = chunk * 1024 # convert to bytes
