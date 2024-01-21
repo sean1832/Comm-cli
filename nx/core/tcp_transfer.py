@@ -6,7 +6,7 @@ import time
 from . import utilities as utils
 
 
-def send_file_tcp(ip, port, file_path, chunk, zip_mode=False, verbose=False):
+def send_file_tcp(ip, port: int, file_path, chunk, zip_mode=False, verbose=False):
     chunk = chunk * 1024  # convert to bytes
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     if verbose:
@@ -73,14 +73,12 @@ def send_file_tcp(ip, port, file_path, chunk, zip_mode=False, verbose=False):
                 sock.sendall(data)
 
                 # print progress
-                utils.print_progress(
-                    f.tell(), file_size, title="Sending", verbose=verbose, unit="auto"
-                )
+                yield {"current": f.tell(), "total": file_size}
         end_time = time.time()
         print(f"\ncomplete in {round(end_time - start_time, 2)} seconds. [{file_path}]")
 
     except socket.error as e:
-        print(f"\nError in sending file: {e}")
+        raise Exception(f"File transfer failed: {e}")
     finally:
         sock.close()
         if is_dir and zip_mode and file_path.endswith(".zip"):
@@ -89,7 +87,7 @@ def send_file_tcp(ip, port, file_path, chunk, zip_mode=False, verbose=False):
             print("TCP Socket closed.")
 
 
-def recieve_file_tcp(port, save_dir, chunk, verbose=False):
+def receive_file_tcp(port, save_dir, chunk, verbose=False):
     chunk = chunk * 1024  # convert to bytes
     server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     if verbose:
@@ -154,9 +152,7 @@ def recieve_file_tcp(port, save_dir, chunk, verbose=False):
                 f.write(data)
 
                 # print progress
-                utils.print_progress(
-                    f.tell(), file_size, title="Receiving", verbose=verbose, unit="auto"
-                )
+                yield {"current": f.tell(), "total": file_size}
 
                 # check if file is complete
                 if f.tell() == file_size:

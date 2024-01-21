@@ -1,6 +1,6 @@
 import nx.core.utilities as utils
 from nx.core.msg_transfer import receive_messages, send_messages  # noqa: F401
-from nx.core.tcp_transfer import recieve_file_tcp, send_file_tcp
+from nx.core.tcp_transfer import receive_file_tcp, send_file_tcp
 
 
 def get_local_ip(*args, **kwargs):
@@ -15,7 +15,16 @@ def send_file(args):
     verbose = args.verbose
     chunk = args.chunk
     zip_mode = args.zip
-    send_file_tcp(ip, port, file_path, chunk, zip_mode, verbose=verbose)
+    for progress in send_file_tcp(
+        ip, port, file_path, chunk, zip_mode, verbose=verbose
+    ):
+        utils.print_progress(
+            progress["current"],
+            progress["total"],
+            title="Sending",
+            verbose=verbose,
+            unit="auto",
+        )
 
 
 def recieve_file(args):
@@ -26,4 +35,11 @@ def recieve_file(args):
         verbose = True
     else:
         verbose = False
-    recieve_file_tcp(port, file_dir, chunk, verbose=verbose)
+    for progress in receive_file_tcp(port, file_dir, chunk, verbose=verbose):
+        utils.print_progress(
+            progress["current"],
+            progress["total"],
+            title="Receiving",
+            verbose=verbose,
+            unit="auto",
+        )
