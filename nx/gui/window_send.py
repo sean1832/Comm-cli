@@ -1,6 +1,8 @@
 import os
+import pathlib
 
 from PySide6.QtCore import Slot
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QComboBox,
     QGridLayout,
@@ -22,6 +24,9 @@ class SendWindow(QWidget):
         self.initUI()
         self.app = app
         self.file_path = None
+        self.setWindowIcon(
+            QIcon(str(pathlib.Path(utils.get_project_root(), "assets/icon.png")))
+        )
 
     def initUI(self):
         # set the size of window

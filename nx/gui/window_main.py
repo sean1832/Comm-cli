@@ -1,4 +1,7 @@
+import pathlib
+
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QGridLayout, QLabel, QPushButton, QWidget
 
 from nx.core import utilities as utils
@@ -10,6 +13,9 @@ class MainWindow(QWidget):
         super().__init__()
         self.app = app
         self.initUI()
+        self.setWindowIcon(
+            QIcon(str(pathlib.Path(utils.get_project_root(), "assets/icon.png")))
+        )
 
     def initUI(self):
         self.setWindowTitle("Network File Exchange Tool")

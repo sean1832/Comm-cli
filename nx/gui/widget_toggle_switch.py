@@ -14,10 +14,10 @@ class ToggleSwitch(QCheckBox):
 
         # Convert the paths to string with forward slashes
         self.img_on = pathlib.Path(
-            get_project_root(), "gui/assets/toggle_on.png"
+            get_project_root(), "assets/toggle_on.png"
         ).as_posix()  # must be in posix format
         self.img_off = pathlib.Path(
-            get_project_root(), "gui/assets/toggle_off.png"
+            get_project_root(), "assets/toggle_off.png"
         ).as_posix()  # must be in posix format
 
         self.setStyleSheet(

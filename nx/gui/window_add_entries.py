@@ -1,6 +1,8 @@
 import os
+import pathlib
 
 from PySide6.QtCore import Qt, Signal
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QDialog,
     QGridLayout,
@@ -21,6 +23,9 @@ class AddEntries(QDialog):
         self.data_source = data_source
         self.name = name
         self.initUI()
+        self.setWindowIcon(
+            QIcon(str(pathlib.Path(utils.get_project_root(), "assets/icon.png")))
+        )
 
     def initUI(self):
         self.setWindowTitle(f"Add {self.name}")

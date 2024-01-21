@@ -1,4 +1,7 @@
+import pathlib
+
 from PySide6.QtCore import Qt, Slot
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QComboBox,
     QFileDialog,
@@ -21,6 +24,9 @@ class ReceiveWindow(QWidget):
         super().__init__()
         self.app = app
         self.initUI()
+        self.setWindowIcon(
+            QIcon(str(pathlib.Path(utils.get_project_root(), "assets/icon.png")))
+        )
 
     def initUI(self):
         self.setWindowTitle("Receiver")
