@@ -162,11 +162,3 @@ def recieve_file_tcp(port, save_dir, chunk, verbose=False):
         if verbose: print("TCP client socket closed.")
         server_sock.close()
         if verbose: print("TCP server socket closed.")
-
-def recieve_files_tcp(port, save_dir, chunk, zip_mode=False, verbose=False):
-    try:
-        while True:
-            recieve_file_tcp(port, save_dir, chunk, verbose=verbose)
-    except KeyboardInterrupt:
-        print("Manual Exit.")
-        return

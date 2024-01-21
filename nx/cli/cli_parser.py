@@ -1,7 +1,14 @@
 import argparse
 
-from nx.cli.cli_commands import get_local_ip, send_messages, receive_messages, send_file, recieve_file
+from nx.cli.cli_commands import (
+    get_local_ip,
+    receive_messages,
+    recieve_file,
+    send_file,
+    send_messages,
+)
 from nx.core.utilities import read_manifest
+
 
 def build_parser():
     parser = argparse.ArgumentParser(description=f"Network Data Exchanger (nx-cli) v{read_manifest()['version']}")
@@ -27,7 +34,6 @@ def build_parser():
     post_file_parser.add_argument('ip', type=str, help='Target IP address')
     post_file_parser.add_argument('port', type=int, help='Port number')
     post_file_parser.add_argument('file_path', type=str, help='File path to send')
-    post_file_parser.add_argument('--udp', action='store_true', help='Use UDP instead of TCP. Faster but less reliable.')
     post_file_parser.add_argument('-c', '--chunk', type=int, help='Chunk size in kb for file transfer. Default 4. Recommended between 4 to 64 kb.', default=4)
     post_file_parser.add_argument('-z', '--zip', action='store_true', help='Zip before sending. Only works for directories.')
     post_file_parser.add_argument('--verbose', action='store_true', help='Print verbose output')
@@ -47,8 +53,6 @@ def build_parser():
     get_file_parser = get_subparsers.add_parser('file', help='Receive files as binary')
     get_file_parser.add_argument('port', type=int, help='Port number')
     get_file_parser.add_argument('file_dir', type=str, help='File directory to save to')
-    get_file_parser.add_argument('-r', '--recursive', action='store_true', help='Receive files recursively')
-    get_file_parser.add_argument('--udp', action='store_true', help='Use UDP instead of TCP. Faster but less reliable.')
     get_file_parser.add_argument('-c', '--chunk', type=int, help='Chunk size in kb for file transfer. Default 4. Recommended between 4 to 64.', default=4)
     get_file_parser.add_argument('--verbose', action='store_true', help='Print verbose output')
     get_file_parser.set_defaults(func=recieve_file)

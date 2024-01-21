@@ -1,7 +1,6 @@
 import socket
-from nx.core.udp_transfer import send_file_udp, recieve_file_udp, recieve_files_udp
-from nx.core.tcp_transfer import send_file_tcp, recieve_file_tcp, recieve_files_tcp
-from nx.core.msg_transfer import send_messages, receive_messages
+from nx.core.tcp_transfer import send_file_tcp, recieve_file_tcp
+from nx.core.msg_transfer import send_messages, receive_messages   # noqa: F401
 
 
 
@@ -24,11 +23,7 @@ def send_file(args):
     verbose = args.verbose
     chunk = args.chunk
     zip_mode = args.zip
-    if args.udp: 
-        send_file_udp(ip, port, file_path, chunk, verbose=verbose)
-    else:
-        send_file_tcp(ip, port, file_path, chunk, zip_mode, verbose=verbose)
-    
+    send_file_tcp(ip, port, file_path, chunk, zip_mode, verbose=verbose)
 
 def recieve_file(args):
     port = args.port
@@ -38,13 +33,5 @@ def recieve_file(args):
         verbose = True
     else:
         verbose = False
-    if args.udp:
-        if args.recursive:
-            recieve_files_udp(port, file_dir, chunk, verbose=verbose)
-        else:
-            recieve_file_udp(port, file_dir, chunk, verbose=verbose)
-    else:
-        if args.recursive:
-            recieve_files_tcp(port, file_dir, chunk, verbose=verbose)
-        else:
-            recieve_file_tcp(port, file_dir, chunk, verbose=verbose)
+    recieve_file_tcp(port, file_dir, chunk, verbose=verbose)
+            
