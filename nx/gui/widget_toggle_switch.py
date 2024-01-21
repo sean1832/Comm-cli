@@ -20,8 +20,6 @@ class ToggleSwitch(QCheckBox):
             get_project_root(), "gui/assets/toggle_off.png"
         ).as_posix()  # must be in posix format
 
-        print(f"Image On Path: {self.img_on}")
-
         self.setStyleSheet(
             f"""
             QCheckBox {{
