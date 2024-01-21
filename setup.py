@@ -13,7 +13,13 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     package_data={
-        "": ["manifest.json", "gui/assets/toggle_on.png", "gui/assets/toggle_off.png"]
+        "": [
+            "manifest.json",
+            "assets/toggle_on.png",
+            "assets/toggle_off.png",
+            "assets/icon.png",
+            "assets/icon.ico",
+        ]
     },
     install_requires=[
         "PySide6",
