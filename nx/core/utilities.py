@@ -13,6 +13,17 @@ def read_manifest():
     with open(manifest_path, "r") as f:
         return json.load(f)
 
+def get_local_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # doesn't even have to be reachable
+        s.connect(("10.255.255.255", 1))
+        ip = s.getsockname()[0]
+    except Exception:
+        ip = "127.0.0.1"
+    finally:
+        s.close()
+    return ip
 
 def zip_dir(dir_path, zip_path, chunk_size=1024 * 1024 * 20):
     total_size = sum(

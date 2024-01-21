@@ -1,20 +1,11 @@
-import socket
-
+import nx.core.utilities as utils
 from nx.core.msg_transfer import receive_messages, send_messages  # noqa: F401
 from nx.core.tcp_transfer import recieve_file_tcp, send_file_tcp
 
 
 def get_local_ip(*args, **kwargs):
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    try:
-        # doesn't even have to be reachable
-        s.connect(("10.255.255.255", 1))
-        IP = s.getsockname()[0]
-    except Exception:
-        IP = "127.0.0.1"
-    finally:
-        s.close()
-    print(f"{IP}")
+    ip = utils.get_local_ip()
+    print(f"{ip}")
 
 
 def send_file(args):
