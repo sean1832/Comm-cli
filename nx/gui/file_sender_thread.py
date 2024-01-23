@@ -7,8 +7,8 @@ class FileSenderThread(QThread):
     update_progress = Signal(dict)
     finished_sending = Signal()
 
-    def __init__(self, ip, port, file_path, chunk_size, zip_mode):
-        super().__init__()
+    def __init__(self, ip, port, file_path, chunk_size, zip_mode, parent=None):
+        super().__init__(parent)
         self.ip = ip
         self.port = port
         self.file_path = file_path

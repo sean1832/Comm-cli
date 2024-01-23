@@ -93,7 +93,9 @@ class ReceiveWindow(QWidget):
                 return
 
             # Create and start the file receiver thread
-            self.file_receiver_thread = FileReceiverThread(port, file_dir, 4)
+            self.file_receiver_thread = FileReceiverThread(
+                port, file_dir, 4, parent=self
+            )
             self.file_receiver_thread.update_progress.connect(self.update_progress_bar)
             self.file_receiver_thread.finished_receiving.connect(
                 self.on_receiving_finished
@@ -117,6 +119,7 @@ class ReceiveWindow(QWidget):
             and self.file_receiver_thread.isRunning()
         ):
             self.file_receiver_thread.requestInterruption()
+            self.file_receiver_thread.terminate()
         super().closeEvent(event)
 
     @Slot(dict)

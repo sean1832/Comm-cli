@@ -8,8 +8,8 @@ class FileReceiverThread(QThread):
     finished_thread = Signal()
     finished_receiving = Signal()
 
-    def __init__(self, port, file_dir, chunk_size):
-        super().__init__()
+    def __init__(self, port, file_dir, chunk_size, parent=None):
+        super().__init__(parent)
         self.port = port
         self.file_dir = file_dir
         self.chunk_size = chunk_size
