@@ -35,6 +35,7 @@ def recieve_file(args):
         verbose = True
     else:
         verbose = False
+    print(f"Local IP: {utils.get_local_ip()}")
     for progress in receive_file_tcp(port, file_dir, chunk, verbose=verbose):
         utils.print_progress(
             progress["current"],
