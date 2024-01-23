@@ -47,7 +47,9 @@ class MainWindow(QWidget):
     def open_send_window(self):
         self.app.send_window = window_send.SendWindow(app=self.app)
         self.app.send_window.show()
+        self.close()
 
     def open_receiver_window(self):
         self.app.receive_window = window_receive.ReceiveWindow(app=self.app)
         self.app.receive_window.show()
+        self.close()
