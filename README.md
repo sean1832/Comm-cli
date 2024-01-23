@@ -1,16 +1,17 @@
-# Network Data Exchanger (nx)
+# NetXchanger (nx)
+<img src="nx/assets/icon.png" width="160">
 
 ## 1. Overview 📋
-Network Data Exchanger (nx-cli) is a versatile command-line tool 🛠️ for sending and receiving messages and binary files over a network. This tool functions similarly to macOS's Airdrop, providing an efficient method for data transfer between computers on the same network. This tool also have a GUI version.
+NetXchanger is a versatile tool 🛠️ for sending and receiving binary files over a network. This tool functions similarly to macOS's Airdrop, but does not limit to macOS devices. NetXchanger is a CLI tool, but also has a GUI version for Windows and macOS.
 
 ## 2. Features 🌟
-- **Plaintext Message Transfer:** Easily send plaintext contents from one computer to another within the same network.
+- **Plaintext Message Transfer:** Easily send plaintext contents from one computer to another within the same network. (Only available in CLI version)
 
 - **File Sharing:** Quickly transfer files between computers without the need for USB drives or third-party websites like emails or messaging apps.
 
 - **Local IP Retrieval:** Conveniently find out your computer's local IP address without needing to run `ipconfig` or `ifconfig`.
 
-- **Cross-Platform Compatibility:** Functions on any system with Python 3.x, enhancing versatility.
+- **Cross-Platform Compatibility:** Functions on any system with Python 3.x, enhancing versatility. (GUI version only works on Windows and macOS)
 
 
 ## 3. Getting Started 🚀
@@ -19,7 +20,11 @@ Network Data Exchanger (nx-cli) is a versatile command-line tool 🛠️ for sen
 - Python 3.x installed on your system.
 - Network connectivity between the computers involved.
 
-### Installation 🔧
+### GUI Installation 🔧
+1. Download the latest release from the [releases page](https://github.com/sean1832/nx-cli/releases/latest) depending on your operating system.
+2. Extract the contents of the zip file and run the executable.
+
+### CLI Installation 🔧
 1. Clone the repository:
    ```bash
    git clone https://github.com/sean1832/nx-cli.git
