@@ -75,7 +75,7 @@ def check_os():
 
 if __name__ == "__main__":
     # get project root
-    project_root = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
     os_name = check_os()
 
@@ -83,13 +83,13 @@ if __name__ == "__main__":
     if os_name == "macOS":
         print("Converting to ICNS...")
         source_img = Path(project_root, "nx/assets/icon.png").resolve().as_posix()
-        target_img = Path(project_root, "nx/assets/icon.ico").resolve().as_posix()
+        target_img = Path(project_root, "nx/assets/icon.icns").resolve().as_posix()
         temp_folder = Path(project_root, "temp").resolve().as_posix()
         convert_icns(source_img, target_img, temp_folder)
     elif os_name == "Windows":
         print("Converting to ICO...")
         source_img = Path(project_root, "nx/assets/icon.png").resolve()
-        target_img = Path(project_root, "nx/assets/icon.icns").resolve()
+        target_img = Path(project_root, "nx/assets/icon.ico").resolve()
         temp_folder = Path(project_root, "temp").resolve()
         convert_icns(source_img, target_img, temp_folder)
     elif os_name == "Linux":
