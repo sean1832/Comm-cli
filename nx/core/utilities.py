@@ -32,7 +32,9 @@ def get_appdata_path():
     if os.name == "nt":  # Windows
         return str(os.getenv("APPDATA"))
     elif os.name == "posix":  # Linux or Mac
-        return str(os.path.expanduser("~"))
+        home_dir = str(os.path.expanduser("~"))
+        app_support_folder = os.path.join(home_dir, "Library/Application Support")
+        return str(app_support_folder)
     else:  # Unsupported OS
         raise OSError(f"Unsupported OS: {os.name}")
 
