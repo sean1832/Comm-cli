@@ -6,6 +6,7 @@ from PySide6.QtWidgets import (
     QComboBox,
     QFileDialog,
     QGridLayout,
+    QLabel,
     QLineEdit,
     QMessageBox,
     QProgressBar,
@@ -34,10 +35,15 @@ class ReceiveWindow(QWidget):
 
     def initUI(self):
         self.setWindowTitle("Receiver")
-        self.resize(300, 300)
 
         # Create a grid layout
         main_layout = QGridLayout(self)
+
+        # create a IP label
+        self.ip_label = QLabel(f"IP: {utils.get_local_ip()}")
+        self.ip_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.ip_label.setStyleSheet("font: Arial; font-size: 15px; black;")
+        main_layout.addWidget(self.ip_label, 0, 0, 1, 2)
 
         # create a port combo box
         self.combo_box_port = QComboBox()
@@ -45,29 +51,29 @@ class ReceiveWindow(QWidget):
         self.combo_box_port.addItem("Add Port...")
         self.combo_box_port.setEditable(True)
         self.combo_box_port.currentIndexChanged.connect(self.on_combobox_port_changed)
-        main_layout.addWidget(self.combo_box_port, 0, 0, 1, 2)
+        main_layout.addWidget(self.combo_box_port, 1, 0, 1, 2)
 
         # create a save path line edit
         self.save_path_line_edit = QLineEdit()
         self.save_path_line_edit.setPlaceholderText("Save Path")
-        main_layout.addWidget(self.save_path_line_edit, 1, 0)
+        main_layout.addWidget(self.save_path_line_edit, 2, 0)
 
         # create a browse button
         self.browse_btn = QPushButton("Browse")
         self.browse_btn.clicked.connect(self.browse_save_path)
-        main_layout.addWidget(self.browse_btn, 1, 1)
+        main_layout.addWidget(self.browse_btn, 2, 1)
 
         # create a toggle switch
         self.toggle_switch.clicked.connect(self.receive_file)
 
         main_layout.addWidget(
-            self.toggle_switch, 2, 0, 1, 2, Qt.AlignmentFlag.AlignCenter
+            self.toggle_switch, 3, 0, 1, 2, Qt.AlignmentFlag.AlignCenter
         )
 
         # progress bar
         self.progress_bar = QProgressBar()
         self.progress_bar.setValue(0)
-        main_layout.addWidget(self.progress_bar, 3, 0, 1, 2)
+        main_layout.addWidget(self.progress_bar, 4, 0, 1, 2)
 
         # Set the layout
         self.setLayout(main_layout)
