@@ -23,6 +23,10 @@ class ReceiveWindow(QWidget):
     def __init__(self, app):
         super().__init__()
         self.app = app
+
+        self.toggle_switch = ToggleSwitch()  # create a toggle switch
+        self.toggle_switch.toggled.connect(self.on_toggle_switch_changed)
+
         self.initUI()
         self.setWindowIcon(
             QIcon(str(pathlib.Path(utils.get_project_root(), "assets/icon.png")))
@@ -54,7 +58,6 @@ class ReceiveWindow(QWidget):
         main_layout.addWidget(self.browse_btn, 1, 1)
 
         # create a toggle switch
-        self.toggle_switch = ToggleSwitch()
         self.toggle_switch.clicked.connect(self.receive_file)
 
         main_layout.addWidget(
@@ -80,7 +83,7 @@ class ReceiveWindow(QWidget):
                     "Please select a save path",
                     QMessageBox.StandardButton.Ok,
                 )
-                self.toggle_switch.setChecked(False)
+                self.close_toggle_switch()
                 return
 
             # Create and start the file receiver thread
@@ -90,13 +93,25 @@ class ReceiveWindow(QWidget):
                 self.on_receiving_finished
             )
             self.file_receiver_thread.start()
-            self.file_receiver_thread.finished.connect(self.close_toggle_switch)
+
         else:
             self.progress_bar.setValue(0)
+
+    def on_toggle_switch_changed(self, checked):
+        if not checked and hasattr(self, "file_receiver_thread"):
+            self.file_receiver_thread.requestInterruption()
 
     def close_toggle_switch(self):
         self.progress_bar.setValue(0)
         self.toggle_switch.setChecked(False)
+
+    def closeEvent(self, event):
+        if (
+            hasattr(self, "file_receiver_thread")
+            and self.file_receiver_thread.isRunning()
+        ):
+            self.file_receiver_thread.requestInterruption()
+        super().closeEvent(event)
 
     @Slot(dict)
     def update_progress_bar(self, progress):
@@ -107,8 +122,7 @@ class ReceiveWindow(QWidget):
 
     @Slot()
     def on_receiving_finished(self):
-        print("done receiving")
-        self.progress_bar.setValue(100)
+        self.progress_bar.setValue(0)
 
     def browse_save_path(self):
         file_path = QFileDialog.getExistingDirectory(
