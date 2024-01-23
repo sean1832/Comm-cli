@@ -3,6 +3,7 @@ import os
 import platform
 import shutil
 from pathlib import Path
+import traceback
 
 
 def get_root():
@@ -44,29 +45,27 @@ if __name__ == "__main__":
     version = get_version()
 
     if os_name == "macOS":
-        source_exe = Path(dist_root, "NetXchanger.app").resolve().as_posix()
-        source_collection = Path(dist_root, "NetXchanger").resolve().as_posix()
+        try:
+            source_exe = Path(dist_root, "NetXchanger.app").resolve().as_posix()
 
-        target_exe = (
-            Path(dist_root, f"NetXchanger_v{version}_mac/NetXchanger.app")
-            .resolve()
-            .as_posix()
-        )
-        target_collection = (
-            Path(dist_root, f"NetXchanger_v{version}_mac/NetXchanger")
-            .resolve()
-            .as_posix()
-        )
+            target_exe = (
+                Path(dist_root, f"NetXchanger_v{version}_mac/NetXchanger.app")
+                .resolve()
+                .as_posix()
+            )
 
-        move_to_dir(source_exe, target_exe)
-        move_to_dir(source_collection, target_collection)
+            move_to_dir(source_exe, target_exe)
 
-        shutil.make_archive(
-            target_exe,
-            "zip",
-            os.path.dirname(target_exe),
-            f"NetXchanger_v{version}_mac",
-        )
+            shutil.make_archive(
+                target_exe,
+                "zip",
+                dist_root,
+                f"NetXchanger_v{version}_mac",
+            )
+        except Exception as e:
+            print(e)
+            traceback.print_exc()
+            exit(1)
 
     elif os_name == "Windows":
         source_root = Path(dist_root, "NetXchanger").resolve()
