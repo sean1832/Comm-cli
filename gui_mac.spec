@@ -40,11 +40,11 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='nx-gui',
+    name='NetXchanger',
 )
 app = BUNDLE(
     coll,
-    name='NexusExchanger_v0.3.0_mac.app',
+    name='NetXchanger.app',
     icon='nx/assets/icon.icns',
     bundle_identifier=None,
 )

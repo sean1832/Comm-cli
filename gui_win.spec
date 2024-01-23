@@ -19,7 +19,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='nx-gui',
+    name='NetXchanger',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -39,5 +39,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='FileExchanger_v0.3.0',
+    name='NetXchanger',
 )
