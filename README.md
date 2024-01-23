@@ -1,4 +1,5 @@
 # NetXchanger (nx)
+
 <img src="nx/assets/icon.png" width="160">
 
 ## 1. Overview 📋
@@ -37,12 +38,6 @@ NetXchanger is a versatile tool 🛠️ for sending and receiving binary files o
 
 ## 4. Usage 📖
 Run `nx` from the terminal or command prompt using various commands to send or receive data.
-
-### GUI
-To run the GUI version of the application, run `nx-gui` from the terminal or command prompt.
-```bash
-nx-gui
-```
 
 #### Get Local IP 🌐
 Retrieve your computer's local IP address:
