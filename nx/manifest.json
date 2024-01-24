@@ -1,7 +1,7 @@
 {
     "name": "nx",
     "full_name": "NetXchanger",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "description": "Simple local network data transfer CLI. Supports file transfer (udp and tcp) and text transfer.",
     "url": "https://github.com/sean1832/nx-cli",
     "author": "ZEKE ZHANG",
