@@ -94,9 +94,14 @@ class SendWindow(QWidget):
             self.file_sender_thread = FileSenderThread(ip, port, file_path, 4, is_dir)
             self.file_sender_thread.update_progress.connect(self.update_progress_bar)
             self.file_sender_thread.finished_sending.connect(self.on_sending_finished)
+            self.file_sender_thread.error_occured.connect(self.on_error_occured)
             self.file_sender_thread.start()
         except Exception as e:
             QMessageBox.critical(self, "Error", str(e))
+
+    @Slot(str)
+    def on_error_occured(self, error):
+        QMessageBox.critical(self, "Error", error)
 
     @Slot(dict)
     def update_progress_bar(self, progress):

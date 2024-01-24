@@ -7,6 +7,7 @@ class FileReceiverThread(QThread):
     update_progress = Signal(dict)
     finished_thread = Signal()
     finished_receiving = Signal()
+    error_occured = Signal(str)
 
     def __init__(
         self,
@@ -31,6 +32,7 @@ class FileReceiverThread(QThread):
                 self.finished_receiving.emit()
                 self.sleep(1)  # prevent the thread from running too fast
             except Exception as e:
+                self.error_occured.emit(str(e))
                 print(f"Error during file receiving: {e}")
                 break
         self.finished_thread.emit()  # emit the signal when the thread is done

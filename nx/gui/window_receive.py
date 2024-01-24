@@ -98,6 +98,7 @@ class ReceiveWindow(QWidget):
             self.file_receiver_thread.finished_receiving.connect(
                 self.on_receiving_finished
             )
+            self.file_receiver_thread.error_occured.connect(self.on_error_occured)
             self.file_receiver_thread.start()
 
         else:
@@ -119,6 +120,11 @@ class ReceiveWindow(QWidget):
             self.file_receiver_thread.requestInterruption()
             self.file_receiver_thread.terminate()
         super().closeEvent(event)
+
+    @Slot(str)
+    def on_error_occured(self, error):
+        QMessageBox.critical(self, "Error", error)
+        self.close_toggle_switch()
 
     @Slot(dict)
     def update_progress_bar(self, progress):

@@ -6,6 +6,7 @@ from nx.core.tcp_transfer import send_file_tcp
 class FileSenderThread(QThread):
     update_progress = Signal(dict)
     finished_sending = Signal()
+    error_occured = Signal(str)
 
     def __init__(self, ip, port, file_path, chunk_size, zip_mode, parent=None):
         super().__init__(parent)
@@ -23,4 +24,5 @@ class FileSenderThread(QThread):
                 self.update_progress.emit(progress)
             self.finished_sending.emit()
         except Exception as e:
+            self.error_occured.emit(str(e))
             print(f"Error during file sending: {e}")
